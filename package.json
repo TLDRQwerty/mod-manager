@@ -11,7 +11,10 @@
     "lint": "eslint --ext .js,.jsx,.ts,.tsx,.vue src"
   },
   "dependencies": {
+    "@headlessui/react": "^1.7.7",
     "@hookform/resolvers": "^2.9.10",
+    "@tanstack/react-router": "0.0.1-beta.53",
+    "@tanstack/react-router-devtools": "0.0.1-beta.49",
     "@tauri-apps/api": "^1.2.0",
     "@typescript-eslint/parser": "^5.48.1",
     "autoprefixer": "^10.4.13",
@@ -20,6 +23,7 @@
     "react-dom": "^18.2.0",
     "react-hook-form": "^7.42.1",
     "react-query": "^3.39.2",
+    "react-router@beta": "link:tanstack/react-router@beta",
     "tailwindcss": "^3.2.4",
     "zod": "^3.20.2"
   },
