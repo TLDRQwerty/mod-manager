@@ -1,28 +1,13 @@
-import { useState } from "react";
-import reactLogo from "./assets/react.svg";
-import { invoke } from "@tauri-apps/api/tauri";
 import "./App.css";
+import { QueryClient, QueryClientProvider } from "react-query";
+import Router from "./pages/Router";
 
-function App(): JSX.Element {
-  const [url, setUrl] = useState("");
+export const queryClient = new QueryClient();
 
-  async function test(): Promise<void> {
-    const result = await invoke("save_game", { url });
-    console.log(result);
-  }
-
+export default function App(): JSX.Element {
   return (
-    <div className="container">
-      <input
-        type="text"
-        value={url}
-        onChange={(e) => {
-          setUrl(e.target.value);
-        }}
-      />
-      <button onClick={test}>Test</button>
-    </div>
+    <QueryClientProvider client={queryClient}>
+      <Router />
+    </QueryClientProvider>
   );
 }
-
-export default App;
