@@ -14,7 +14,12 @@
     "resolveJsonModule": true,
     "isolatedModules": true,
     "noEmit": true,
-    "jsx": "react-jsx"
+    "jsx": "react-jsx",
+    "rootDir": "src",
+    "declarationDir": "dist",
+    "paths": {
+      "~/*": ["./src/*"]
+    }
   },
   "include": ["src", "./.eslintrc.cjs"],
   "references": [{ "path": "./tsconfig.node.json" }]

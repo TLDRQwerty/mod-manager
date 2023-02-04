@@ -3,8 +3,8 @@ lockfileVersion: 5.4
 specifiers:
   '@headlessui/react': ^1.7.7
   '@hookform/resolvers': ^2.9.10
-  '@tanstack/react-router': 0.0.1-beta.53
-  '@tanstack/react-router-devtools': 0.0.1-beta.49
+  '@tanstack/react-router': 0.0.1-beta.70
+  '@tanstack/react-router-devtools': 0.0.1-beta.70
   '@tauri-apps/api': ^1.2.0
   '@tauri-apps/cli': ^1.2.2
   '@types/node': ^18.7.10
@@ -32,13 +32,14 @@ specifiers:
   tailwindcss: ^3.2.4
   typescript: ^4.9.4
   vite: ^4.0.0
+  vite-tsconfig-paths: ^4.0.5
   zod: ^3.20.2
 
 dependencies:
   '@headlessui/react': 1.7.7_biqbaboplfbrettd7655fr4n2y
   '@hookform/resolvers': 2.9.10_react-hook-form@7.42.1
-  '@tanstack/react-router': 0.0.1-beta.53_biqbaboplfbrettd7655fr4n2y
-  '@tanstack/react-router-devtools': 0.0.1-beta.49_biqbaboplfbrettd7655fr4n2y
+  '@tanstack/react-router': 0.0.1-beta.70_biqbaboplfbrettd7655fr4n2y
+  '@tanstack/react-router-devtools': 0.0.1-beta.70_biqbaboplfbrettd7655fr4n2y
   '@tauri-apps/api': 1.2.0
   '@typescript-eslint/parser': 5.48.1_iukboom6ndih5an6iafl45j2fe
   autoprefixer: 10.4.13_postcss@8.4.21
@@ -69,6 +70,7 @@ devDependencies:
   prettier: 2.8.2
   typescript: 4.9.4
   vite: 4.0.4_@types+node@18.11.18
+  vite-tsconfig-paths: 4.0.5_typescript@4.9.4
 
 packages:
 
@@ -613,82 +615,60 @@ packages:
       '@nodelib/fs.scandir': 2.1.5
       fastq: 1.15.0
 
-  /@solidjs/reactivity/0.0.7:
-    resolution: {integrity: sha512-phONsQ2J7iGlsXbCeVFJTD57P4jzCX9hsV17QoIrj27fs26n3vHBYxFkFUbn6E9eq+wjbdXo5zbirLj5WsvLxA==}
-    dev: false
-
-  /@tanstack/react-router-devtools/0.0.1-beta.49_biqbaboplfbrettd7655fr4n2y:
-    resolution: {integrity: sha512-wuQ5KGD5vFOXnRCrxJb8YSzfOc6NIUkWscLTvkU5fV2ODNvHRY1dz5S3ul9KWGdtnx1DANJpsUCUxOWjsiuU3Q==}
+  /@tanstack/react-router-devtools/0.0.1-beta.70_biqbaboplfbrettd7655fr4n2y:
+    resolution: {integrity: sha512-4umcIOu8Pt+grDFJ29zOswFDdEBzwK/Jc+aDlMKbM+F60MBcTd+xa+d+dIwbXj50PQTbYHR/wAy6543sqmjfeg==}
     engines: {node: '>=12'}
     peerDependencies:
       react: '>=16'
       react-dom: '>=16'
     dependencies:
       '@babel/runtime': 7.20.13
-      '@tanstack/react-router': 0.0.1-beta.49_biqbaboplfbrettd7655fr4n2y
+      '@tanstack/react-router': 0.0.1-beta.70_biqbaboplfbrettd7655fr4n2y
       date-fns: 2.29.3
       react: 18.2.0
       react-dom: 18.2.0_react@18.2.0
     dev: false
 
-  /@tanstack/react-router/0.0.1-beta.49_biqbaboplfbrettd7655fr4n2y:
-    resolution: {integrity: sha512-BQAEOUX+4WQ2z9goOl/HQRt4bHmlKNkZv7chGhYqhe8rzp8/6pRgChSJR1co7a8ba0KU+8Bb7Zxu196Ix7TjWg==}
+  /@tanstack/react-router/0.0.1-beta.70_biqbaboplfbrettd7655fr4n2y:
+    resolution: {integrity: sha512-XXLUien8nvdsbbnn9iDEutIqiedneKFetAhPIYsF7JfHlgQN4dtpEZJ+kYlZwoylZkry80dI+QalIdRBmm9tLw==}
     engines: {node: '>=12'}
     peerDependencies:
       react: '>=16'
       react-dom: '>=16'
     dependencies:
       '@babel/runtime': 7.20.13
-      '@solidjs/reactivity': 0.0.7
-      '@tanstack/router-core': 0.0.1-beta.49_biqbaboplfbrettd7655fr4n2y
+      '@tanstack/react-store': 0.0.1-beta.62_biqbaboplfbrettd7655fr4n2y
+      '@tanstack/router': 0.0.1-beta.70
+      react: 18.2.0
+      react-dom: 18.2.0_react@18.2.0
+    dev: false
+
+  /@tanstack/react-store/0.0.1-beta.62_biqbaboplfbrettd7655fr4n2y:
+    resolution: {integrity: sha512-8sv1E1/yo3/7WfEadibQM4lkWKx6CYX6JnW7Lj5gOMgIXACYQax1wjxwYiKyfRM147CJi/yKBW0X9ZoV+0GUyw==}
+    engines: {node: '>=12'}
+    peerDependencies:
+      react: '>=16'
+      react-dom: '>=16'
+    dependencies:
+      '@tanstack/store': 0.0.1-beta.62
       react: 18.2.0
       react-dom: 18.2.0_react@18.2.0
       use-sync-external-store: 1.2.0_react@18.2.0
     dev: false
 
-  /@tanstack/react-router/0.0.1-beta.53_biqbaboplfbrettd7655fr4n2y:
-    resolution: {integrity: sha512-vqBCSzlRqNJ/KhldzUuRN8OsuxVJt/aXxsRmJMUFLtu+TaHe8xj6jpdiy0P9IlIcsXEdE+XasWj4bkn4lGslGA==}
+  /@tanstack/router/0.0.1-beta.70:
+    resolution: {integrity: sha512-4IkbGjmAjFE9bDK/yAN4rrcbtxm2SpnjNKY0v1G1qHyE2ZnjdYh/RpOg7gYBcA9YL//SAbJh0pc6j0ynf+LlWQ==}
     engines: {node: '>=12'}
-    peerDependencies:
-      react: '>=16'
-      react-dom: '>=16'
     dependencies:
       '@babel/runtime': 7.20.13
-      '@solidjs/reactivity': 0.0.7
-      '@tanstack/router-core': 0.0.1-beta.53_biqbaboplfbrettd7655fr4n2y
-      react: 18.2.0
-      react-dom: 18.2.0_react@18.2.0
-      use-sync-external-store: 1.2.0_react@18.2.0
+      '@tanstack/store': 0.0.1-beta.62
+      tiny-invariant: 1.3.1
+      tiny-warning: 1.0.3
     dev: false
 
-  /@tanstack/router-core/0.0.1-beta.49_biqbaboplfbrettd7655fr4n2y:
-    resolution: {integrity: sha512-JBbSOIxTr4lWI7fz53hrnzOMVhvddnki8N4SRhnLCXQZZfcvoKFVtJdeVq6wX/YeZfhySMx2Fk7uiM233WrKDw==}
+  /@tanstack/store/0.0.1-beta.62:
+    resolution: {integrity: sha512-0XNKx+H7Wj/mt4hqWIDQcWtGiVInWqwSQY1JkQwf5vzhG10hpRsnvnufcVQc5MDPXPt/4PDHlJAVUp2gj7OCKA==}
     engines: {node: '>=12'}
-    peerDependencies:
-      react: '>=16'
-      react-dom: '>=16'
-    dependencies:
-      '@babel/runtime': 7.20.13
-      '@solidjs/reactivity': 0.0.7
-      immer: 9.0.18
-      react: 18.2.0
-      react-dom: 18.2.0_react@18.2.0
-      tiny-invariant: 1.3.1
-    dev: false
-
-  /@tanstack/router-core/0.0.1-beta.53_biqbaboplfbrettd7655fr4n2y:
-    resolution: {integrity: sha512-reC6IJjwgtjAyZx3ZbI5aKlV2KPtLUunCAjiRSIgfmRYFDTWrS0vHFQoSOksBzZYTNr98kB7UGvLo70KyYc/aQ==}
-    engines: {node: '>=12'}
-    peerDependencies:
-      react: '>=16'
-      react-dom: '>=16'
-    dependencies:
-      '@babel/runtime': 7.20.13
-      '@solidjs/reactivity': 0.0.7
-      immer: 9.0.18
-      react: 18.2.0
-      react-dom: 18.2.0_react@18.2.0
-      tiny-invariant: 1.3.1
     dev: false
 
   /@tauri-apps/api/1.2.0:
@@ -1937,6 +1917,10 @@ packages:
       merge2: 1.4.1
       slash: 3.0.0
 
+  /globrex/0.1.2:
+    resolution: {integrity: sha512-uHJgbwAMwNFf5mLst7IWLNg14x1CkeqglJb/K3doi4dw6q2IvAAmM/Y81kevy83wP+Sst+nutFTYOGg3d1lsxg==}
+    dev: true
+
   /gopd/1.0.1:
     resolution: {integrity: sha512-d65bNlIadxvpb/A2abVdlqKqV563juRnZ1Wtk6s1sIR8uNsXR70xqIzVqxVf1eTqDunwT2MkczEeaezCKTZhwA==}
     dependencies:
@@ -1991,10 +1975,6 @@ packages:
   /ignore/5.2.4:
     resolution: {integrity: sha512-MAb38BcSbH0eHNBxn7ql2NH/kX33OkB3lZ1BNdh7ENeRChHTYsTvWrMubiIAMNS2llXEEgZ1MUOBtXChP3kaFQ==}
     engines: {node: '>= 4'}
-
-  /immer/9.0.18:
-    resolution: {integrity: sha512-eAPNpsj7Ax1q6Y/3lm2PmlwRcFzpON7HSNQ3ru5WQH1/PSpnyed/HpNOELl2CxLKoj4r+bAHgdyKqW5gc2Se1A==}
-    dev: false
 
   /import-fresh/3.3.0:
     resolution: {integrity: sha512-veYYhQa+D1QBKznvhUHxb8faxlrwUnxseDAbAp457E0wLNio2bOSKnjYDhMj+YiAq61xrMGhQk9iXVk5FzgQMw==}
@@ -2832,6 +2812,10 @@ packages:
     resolution: {integrity: sha512-AD5ih2NlSssTCwsMznbvwMZpJ1cbhkGd2uueNxzv2jDlEeZdU04JQfRnggJQ8DrcVBGjAsCKwFBbDlVNtEMlzw==}
     dev: false
 
+  /tiny-warning/1.0.3:
+    resolution: {integrity: sha512-lBN9zLN/oAf68o3zNXYrdCt1kP8WsiGW8Oo2ka41b2IM5JL/S1CTyX1rW0mb/zSuJun0ZUrDxx4sqvYS2FWzPA==}
+    dev: false
+
   /to-fast-properties/2.0.0:
     resolution: {integrity: sha512-/OaKK0xYrs3DmxRYqL/yDc+FxFUVYhDlXMhRmv3z915w2HF1tnN1omB354j8VUGO/hbRzyD6Y3sA7v7GS/ceog==}
     engines: {node: '>=4'}
@@ -2842,6 +2826,19 @@ packages:
     engines: {node: '>=8.0'}
     dependencies:
       is-number: 7.0.0
+
+  /tsconfck/2.0.2_typescript@4.9.4:
+    resolution: {integrity: sha512-H3DWlwKpow+GpVLm/2cpmok72pwRr1YFROV3YzAmvzfGFiC1zEM/mc9b7+1XnrxuXtEbhJ7xUSIqjPFbedp7aQ==}
+    engines: {node: ^14.13.1 || ^16 || >=18, pnpm: ^7.18.0}
+    hasBin: true
+    peerDependencies:
+      typescript: ^4.3.5
+    peerDependenciesMeta:
+      typescript:
+        optional: true
+    dependencies:
+      typescript: 4.9.4
+    dev: true
 
   /tsconfig-paths/3.14.1:
     resolution: {integrity: sha512-fxDhWnFSLt3VuTwtvJt5fpwxBHg5AdKWMsgcPOOIilyjymcYVZoCQF8fvFRezCNfblEXmi+PcM1eYHeOAgXCOQ==}
@@ -2929,6 +2926,17 @@ packages:
   /util-deprecate/1.0.2:
     resolution: {integrity: sha512-EPD5q1uXyFxJpCrLnCc1nHnq3gOa6DZBocAIiI2TaSCA7VCJ1UJDMagCzIkXNsUYfD1daK//LTEQ8xiIbrHtcw==}
     dev: false
+
+  /vite-tsconfig-paths/4.0.5_typescript@4.9.4:
+    resolution: {integrity: sha512-/L/eHwySFYjwxoYt1WRJniuK/jPv+WGwgRGBYx3leciR5wBeqntQpUE6Js6+TJemChc+ter7fDBKieyEWDx4yQ==}
+    dependencies:
+      debug: 4.3.4
+      globrex: 0.1.2
+      tsconfck: 2.0.2_typescript@4.9.4
+    transitivePeerDependencies:
+      - supports-color
+      - typescript
+    dev: true
 
   /vite/4.0.4_@types+node@18.11.18:
     resolution: {integrity: sha512-xevPU7M8FU0i/80DMR+YhgrzR5KS2ORy1B4xcX/cXLsvnUWvfHuqMmVU6N0YiJ4JWGRJJsLCgjEzKjG9/GKoSw==}

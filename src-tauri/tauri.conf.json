@@ -58,7 +58,8 @@
         "height": 600,
         "resizable": true,
         "title": "mod-manager",
-        "width": 800
+        "width": 800,
+        "fileDropEnabled": true
       }
     ]
   }
