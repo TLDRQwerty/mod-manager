@@ -28,6 +28,8 @@ tempfile = "3.3.0"
 zip = "0.6.3"
 rocket = "0.4.11"
 thiserror = "1.0.38"
+bbcode = "1.0.2"
+html2md = "0.2.14"
 
 [features]
 # by default Tauri runs in production mode

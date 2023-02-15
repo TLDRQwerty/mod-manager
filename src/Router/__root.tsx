@@ -7,8 +7,9 @@ export const rootRoute = new RootRoute({
       <div>
         <Link to="/">Home</Link>
       </div>
-      <hr />
-      <Outlet />
+      <div className="p-2">
+        <Outlet />
+      </div>
       <TanStackRouterDevtools position="bottom-right" />
     </>
   ),

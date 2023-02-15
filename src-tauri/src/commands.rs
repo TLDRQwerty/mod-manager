@@ -2,15 +2,12 @@ use std::path::Path;
 
 use prisma::{game, game_mod};
 use prisma_client_rust::{QueryError, NewClientError};
-use reqwest::Url;
 use std::fs::File;
-use std::io::copy;
-use tauri::generate_context;
+use tauri::{generate_context, State};
 use tempfile::Builder;
 use tokio::fs::symlink;
 
-use crate::prisma;
-use crate::prisma::game::nexus_game_identifier;
+use crate::{prisma};
 
 #[derive(thiserror::Error, Debug)]
 pub enum Error {
@@ -242,7 +239,7 @@ pub async fn delete_mod(mod_id: i32) -> Result<game_mod::Data, Error> {
 }
 
 #[tauri::command]
-pub async fn enable_mod(mod_id: i32) -> game_mod::Data {
+pub async fn enable_mod(mod_id: i32) -> Result<game_mod::Data, Error> {
     let client = prisma::new_client().await.unwrap();
 
     let game_mod = client
@@ -266,7 +263,7 @@ pub async fn enable_mod(mod_id: i32) -> game_mod::Data {
         if let Some(game) = game {
             let dest = Path::new(&game.game_mod_folder_path).join(path.split("/").last().unwrap());
 
-            let absolute_path =tauri::api::path::app_cache_dir(generate_context!().config()).unwrap().join(path);
+            let absolute_path = tauri::api::path::app_cache_dir(generate_context!().config()).unwrap().join(path);
             println!("symlinked {:?} to {:?}", absolute_path, dest);
             symlink(&absolute_path, &dest).await.unwrap();
 
@@ -282,15 +279,15 @@ pub async fn enable_mod(mod_id: i32) -> game_mod::Data {
                 .await
                 .unwrap();
 
-            return game_mod;
+            return Ok(game_mod);
         }
     }
 
-    game_mod
+    Ok(game_mod)
 }
 
 #[tauri::command]
-pub async fn disable_mod(mod_id: i32) -> game_mod::Data {
+pub async fn disable_mod(mod_id: i32) -> Result<game_mod::Data, Error> {
     let client = prisma::new_client().await.unwrap();
 
     let game_mod = client
@@ -329,11 +326,49 @@ pub async fn disable_mod(mod_id: i32) -> game_mod::Data {
                 .await
                 .unwrap();
 
-            return game_mod;
+            return Ok(game_mod);
         }
     }
 
-    game_mod
+    Ok(game_mod)
+}
+
+#[tauri::command]
+pub async fn find_mod(mod_id: i32) -> Result<game_mod::Data, Error> {
+    let client = prisma::new_client().await.unwrap();
+
+    let game_mod = client
+        .game_mod()
+        .find_first(vec![game_mod::id::equals(mod_id)])
+        .exec()
+        .await?;
+
+    if let Some(game_mod) = game_mod {
+        Ok(game_mod)
+    } else {
+        Err(Error::StringError("mod not found".to_string()))
+    }
+}
+
+#[tauri::command]
+pub async fn toggle_mod(mod_id: i32) -> Result<game_mod::Data, Error> {
+    let client = prisma::new_client().await.unwrap();
+
+    let game_mod = client
+        .game_mod()
+        .find_first(vec![game_mod::id::equals(mod_id)])
+        .exec()
+        .await?;
+
+    if let Some(game_mod) = game_mod {
+        if game_mod.enabled {
+            Ok(disable_mod(mod_id).await?)
+        } else {
+            Ok(enable_mod(mod_id).await?)
+        }
+    } else {
+        Err(Error::StringError("mod not found".to_string()))
+    }
 }
 
 async fn download_mod_from_url(url: String) -> String {
@@ -356,7 +391,8 @@ async fn download_mod_from_url(url: String) -> String {
 }
 
 #[tauri::command]
-pub async fn download_mod_details(mod_id: i32) -> Result<game_mod::Data, Error> {
+pub async fn download_mod_details(mod_id: i32, nexus_mod_id: i32) -> Result<game_mod::Data, Error> {
+    println!("download_mod_details");
     let client = prisma::new_client().await.unwrap();
 
     let game_mod = client
@@ -380,7 +416,9 @@ pub async fn download_mod_details(mod_id: i32) -> Result<game_mod::Data, Error> 
             let nexus_integration = NexusIntegration::new(api_key.unwrap().to_string());
 
             if let Some(nexus_game_identifier) = game.nexus_game_identifier {
-                let mod_details = nexus_integration.get_mod_details(nexus_game_identifier, mod_id).await;
+                let mod_details = nexus_integration.get_mod_details(nexus_game_identifier, nexus_mod_id).await;
+
+                let description = html2md::parse_html(&bbcode::str_to_html(&mod_details.description));
 
                     let game_mod = client
                         .game_mod()
@@ -389,9 +427,10 @@ pub async fn download_mod_details(mod_id: i32) -> Result<game_mod::Data, Error> 
                             vec![
                                 game_mod::name::set(mod_details.name),
                                 game_mod::summary::set(Some(mod_details.summary)),
-                                game_mod::description::set(Some(mod_details.description)),
+                                game_mod::description::set(Some(description)),
                                 game_mod::version::set(Some(mod_details.version)),
                                 game_mod::author::set(Some(mod_details.author)),
+                                game_mod::picture_url::set(Some(mod_details.picture_url)),
                             ],
                         )
                         .exec()
@@ -469,12 +508,14 @@ impl NexusIntegration {
 
         println!("URL -> {}", url);
 
-        match reqwest::Client::new()
+        println!("APIKEY -> {}", self.api_key);
+        let request = reqwest::Client::new()
             .get(&url)
             .header("apikey", self.api_key)
             .send()
-            .await
-        {
+            .await;
+        println!("Request -> {:?}", request);
+        match request {
             Ok(mod_detail) => match mod_detail.json::<ModDetailReponse>().await {
                 Ok(mod_detail) => mod_detail,
                 Err(e) => {

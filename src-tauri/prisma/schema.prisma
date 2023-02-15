@@ -30,6 +30,7 @@ model GameMod {
   author            String?
   modId             Int?
   enabled           Boolean @default(false)
+  pictureUrl        String?
 
   notes             String?
 

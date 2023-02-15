@@ -5,7 +5,7 @@ function Table({
 }: React.TableHTMLAttributes<HTMLTableElement>): JSX.Element {
   return (
     <table
-      className="table-auto border-collapse border border-gray-300 w-screen"
+      className="border-collapse border border-gray-300 w-full"
       {...props}
     />
   );
@@ -41,10 +41,11 @@ function Cell({
   return <td className="border border-gray-300" {...props} />;
 }
 
-function Header(
-  props: React.TableHTMLAttributes<HTMLTableCellElement>
-): JSX.Element {
-  return <th className="border border-gray-300" {...props} />;
+function Header({
+  className = "",
+  ...props
+}: React.TableHTMLAttributes<HTMLTableCellElement>): JSX.Element {
+  return <th className={`border border-gray-300 ${className}`} {...props} />;
 }
 
 export default Object.assign(Table, {

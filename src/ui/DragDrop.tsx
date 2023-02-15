@@ -9,7 +9,7 @@ interface Props {
 
 export function DragDrop({
   onDrop,
-  className,
+  className = "",
   onFilesPicked,
 }: Props): JSX.Element {
   const onClick = async (): Promise<void> => {
@@ -30,7 +30,7 @@ export function DragDrop({
     <div
       onClick={onFilesPicked != null ? onClick : undefined}
       onDrop={onDrop}
-      className={className}
+      className={`${className} cursor-pointer`}
     />
   );
 }
