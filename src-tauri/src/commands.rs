@@ -1,13 +1,13 @@
 use std::path::Path;
 
 use prisma::{game, game_mod};
-use prisma_client_rust::{QueryError, NewClientError};
+use prisma_client_rust::{NewClientError, QueryError};
 use std::fs::File;
 use tauri::{generate_context, State};
 use tempfile::Builder;
 use tokio::fs::symlink;
 
-use crate::{prisma};
+use crate::prisma;
 
 #[derive(thiserror::Error, Debug)]
 pub enum Error {
@@ -38,7 +38,7 @@ impl serde::Serialize for Error {
     where
         S: serde::Serializer,
     {
-            serializer.serialize_str(&self.to_string().as_ref())
+        serializer.serialize_str(&self.to_string().as_ref())
     }
 }
 
@@ -263,7 +263,9 @@ pub async fn enable_mod(mod_id: i32) -> Result<game_mod::Data, Error> {
         if let Some(game) = game {
             let dest = Path::new(&game.game_mod_folder_path).join(path.split("/").last().unwrap());
 
-            let absolute_path = tauri::api::path::app_cache_dir(generate_context!().config()).unwrap().join(path);
+            let absolute_path = tauri::api::path::app_cache_dir(generate_context!().config())
+                .unwrap()
+                .join(path);
             println!("symlinked {:?} to {:?}", absolute_path, dest);
             symlink(&absolute_path, &dest).await.unwrap();
 
@@ -416,27 +418,30 @@ pub async fn download_mod_details(mod_id: i32, nexus_mod_id: i32) -> Result<game
             let nexus_integration = NexusIntegration::new(api_key.unwrap().to_string());
 
             if let Some(nexus_game_identifier) = game.nexus_game_identifier {
-                let mod_details = nexus_integration.get_mod_details(nexus_game_identifier, nexus_mod_id).await;
+                let mod_details = nexus_integration
+                    .get_mod_details(nexus_game_identifier, nexus_mod_id)
+                    .await;
 
-                let description = html2md::parse_html(&bbcode::str_to_html(&mod_details.description));
+                let description =
+                    html2md::parse_html(&bbcode::str_to_html(&mod_details.description));
 
-                    let game_mod = client
-                        .game_mod()
-                        .update(
-                            game_mod::id::equals(mod_id),
-                            vec![
-                                game_mod::name::set(mod_details.name),
-                                game_mod::summary::set(Some(mod_details.summary)),
-                                game_mod::description::set(Some(description)),
-                                game_mod::version::set(Some(mod_details.version)),
-                                game_mod::author::set(Some(mod_details.author)),
-                                game_mod::picture_url::set(Some(mod_details.picture_url)),
-                            ],
-                        )
-                        .exec()
-                        .await?;
+                let game_mod = client
+                    .game_mod()
+                    .update(
+                        game_mod::id::equals(mod_id),
+                        vec![
+                            game_mod::name::set(mod_details.name),
+                            game_mod::summary::set(Some(mod_details.summary)),
+                            game_mod::description::set(Some(description)),
+                            game_mod::version::set(Some(mod_details.version)),
+                            game_mod::author::set(Some(mod_details.author)),
+                            game_mod::picture_url::set(Some(mod_details.picture_url)),
+                        ],
+                    )
+                    .exec()
+                    .await?;
 
-                    return Ok(game_mod);
+                return Ok(game_mod);
             }
         }
     }
