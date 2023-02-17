@@ -12,6 +12,7 @@ const COMMANDS = {
   download_mod_details: "download_mod_details",
   toggle_mod: "toggle_mod",
   find_mod: "find_mod",
+  find_game: "find_game",
 } as const;
 
 type COMMANDS = (typeof COMMANDS)[keyof typeof COMMANDS];

@@ -1,5 +1,6 @@
 use std::path::Path;
 
+use bbcode::BBCode;
 use prisma::{game, game_mod};
 use prisma_client_rust::{NewClientError, QueryError};
 use std::fs::File;
@@ -7,7 +8,7 @@ use tauri::{generate_context, State};
 use tempfile::Builder;
 use tokio::fs::symlink;
 
-use crate::prisma;
+use crate::prisma::{self, game_mod::relative_folder_path};
 
 #[derive(thiserror::Error, Debug)]
 pub enum Error {
@@ -88,6 +89,74 @@ pub async fn find_all_games() -> Result<Vec<game::Data>, Error> {
 #[tauri::command]
 pub async fn delete_game(game_id: i32) -> Result<game::Data, Error> {
     let client = prisma::new_client().await.unwrap();
+
+    let game = client
+        .game()
+        .find_first(vec![game::id::equals(game_id)])
+        .exec()
+        .await?;
+
+    let game = match game {
+        Some(game) => game,
+        None => return Err(Error::StringError("Game not found".to_string())),
+    };
+
+    let mods = client
+        .game_mod()
+        .find_many(vec![game_mod::game::is(vec![game::id::equals(game_id)])])
+        .exec()
+        .await?;
+
+    for game_mod in mods {
+        let relative_folder_path = match game_mod.relative_folder_path {
+            Some(p) => p,
+            None => {
+                return Err(Error::StringError(
+                        "Game install path not found".to_string(),
+                        ))
+            }
+        };
+        if game_mod.enabled {
+            let path = Path::new(&game.game_mod_folder_path).join(&relative_folder_path);
+
+            if path.exists() {
+                std::fs::remove_dir_all(&path)?;
+            }
+        }
+
+        let path = tauri::api::path::app_cache_dir(generate_context!().config());
+
+        let path = match path {
+            Some(p) => p,
+            None => return Err(Error::StringError("Download path not found".to_string())),
+        };
+
+        let relative_archive_path = match game_mod.relative_archive_path {
+            Some(p) => p,
+            None => {
+                return Err(Error::StringError(
+                    "Game install path not found".to_string(),
+                ))
+            }
+        };
+
+        let extracted_path = path.join(&relative_folder_path);
+        let archive_path = path.join(&relative_archive_path);
+
+        if extracted_path.exists() {
+            std::fs::remove_dir_all(&extracted_path)?;
+        }
+
+        if archive_path.exists() {
+            std::fs::remove_file(&archive_path)?;
+        }
+
+        let game_mod = client
+            .game_mod()
+            .delete(game_mod::id::equals(game_mod.id))
+            .exec()
+            .await?;
+    }
 
     let game = client
         .game()
@@ -336,6 +405,23 @@ pub async fn disable_mod(mod_id: i32) -> Result<game_mod::Data, Error> {
 }
 
 #[tauri::command]
+pub async fn find_game(game_id: i32) -> Result<game::Data, Error> {
+    let client = prisma::new_client().await.unwrap();
+
+    let game = client
+        .game()
+        .find_first(vec![game::id::equals(game_id)])
+        .exec()
+        .await?;
+
+    if let Some(game) = game {
+        Ok(game)
+    } else {
+        Err(Error::StringError("game not found".to_string()))
+    }
+}
+
+#[tauri::command]
 pub async fn find_mod(mod_id: i32) -> Result<game_mod::Data, Error> {
     let client = prisma::new_client().await.unwrap();
 
@@ -422,8 +508,9 @@ pub async fn download_mod_details(mod_id: i32, nexus_mod_id: i32) -> Result<game
                     .get_mod_details(nexus_game_identifier, nexus_mod_id)
                     .await;
 
-                let description =
-                    html2md::parse_html(&bbcode::str_to_html(&mod_details.description));
+                let a = mod_details.description.as_str().as_html();
+
+                println!("a: {}", a);
 
                 let game_mod = client
                     .game_mod()
@@ -432,7 +519,7 @@ pub async fn download_mod_details(mod_id: i32, nexus_mod_id: i32) -> Result<game
                         vec![
                             game_mod::name::set(mod_details.name),
                             game_mod::summary::set(Some(mod_details.summary)),
-                            game_mod::description::set(Some(description)),
+                            game_mod::description::set(Some(mod_details.description)),
                             game_mod::version::set(Some(mod_details.version)),
                             game_mod::author::set(Some(mod_details.author)),
                             game_mod::picture_url::set(Some(mod_details.picture_url)),

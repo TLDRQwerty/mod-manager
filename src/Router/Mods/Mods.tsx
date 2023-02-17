@@ -1,8 +1,14 @@
-import { useState } from "react";
-import { Link, Outlet, Route, useParams } from "@tanstack/react-router";
+import { useEffect, useState } from "react";
+import {
+  Link,
+  Outlet,
+  Route,
+  useParams,
+  useRouter,
+} from "@tanstack/react-router";
 import { useForm } from "react-hook-form";
 import { useQuery, UseQueryResult } from "react-query";
-import { Mod } from "~/types";
+import { Game, Mod } from "~/types";
 import Button from "~/ui/Button";
 import Checkbox from "~/ui/Checkbox";
 import Dialog from "~/ui/Dialog";
@@ -12,6 +18,9 @@ import { invoke } from "~/utils";
 import { gamesRoute } from "../Games";
 import * as z from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { modRoute } from "./Mod";
+import Switch from "~/ui/Switch";
+import clsx from "clsx";
 
 export const modsRoute = new Route({
   getParentRoute: () => gamesRoute,
@@ -37,6 +46,22 @@ function useFetchMods(gameId: string): UseQueryResult<Mod[], unknown> {
   );
 }
 
+async function fetchGame(gameId: string): Promise<Game> {
+  const response = await invoke<Game>("find_game", {
+    gameId: parseInt(gameId, 10),
+  });
+
+  if (typeof response === "string") {
+    throw new Error(response);
+  }
+
+  return response;
+}
+
+function useFindGame(gameId: string): UseQueryResult<Game, unknown> {
+  return useQuery(["find_game", gameId], async () => await fetchGame(gameId));
+}
+
 function AddMods(): JSX.Element {
   const { gameId } = useParams({ from: gamesRoute.id });
 
@@ -49,44 +74,46 @@ function AddMods(): JSX.Element {
   };
 
   return (
-    <>
-      <DragDrop
-        onDrop={async (paths) => {
-          if (gameId == null) return;
-          void (await invoke("add_mods", {
-            gameId: parseInt(gameId, 10),
-            paths,
-          }));
-        }}
-        onFilesPicked={handleFilesPicked}
-        className="bg-gray-100 h-32"
-      />
-    </>
+    <DragDrop
+      onDrop={async (paths) => {
+        if (gameId == null) return;
+        void (await invoke("add_mods", {
+          gameId: parseInt(gameId, 10),
+          paths,
+        }));
+      }}
+      onFilesPicked={handleFilesPicked}
+      className="bg-gray-100 my-8"
+    />
   );
 }
 
 function Mods(): JSX.Element {
-  const { gameId } = useParams({ from: modsRoute.id });
-  const { data, isLoading } = useFetchMods(gameId);
+  const { modId, gameId } = useParams({ from: modRoute.id });
+  const { data } = useFetchMods(gameId);
+  const { data: game } = useFindGame(gameId);
+  const [selected, setSelected] = useState<number[]>([]);
 
   const toggleMod = async (modId: number): Promise<void> => {
     void (await invoke("toggle_mod", { modId }));
   };
 
-  if (isLoading) return <div>Loading...</div>;
-
   return (
     <div>
-      <h1>Mods</h1>
+      <h1>{game.name} Mods</h1>
 
       <AddMods />
 
-      <div>
-        <Table>
+      <div className={modId != null ? "grid grid-cols-2" : undefined}>
+        <Table className="w-full h-full overflow-y">
           <Table.Head>
             <Table.Row>
               <Table.Header>Name</Table.Header>
-              <Table.Header className="w-1/3 overflow-ellipsis">
+              <Table.Header
+                className={`w-1/3 overflow-ellipsis ${
+                  modId != null ? "hidden" : "visible"
+                }`}
+              >
                 Description
               </Table.Header>
               <Table.Header>Author</Table.Header>
@@ -97,7 +124,22 @@ function Mods(): JSX.Element {
           </Table.Head>
           <Table.Body>
             {data?.map((mod) => (
-              <Table.Row key={mod.id}>
+              <Table.Row
+                key={mod.id}
+                className={clsx({
+                  "bg-orange-500/50": selected.includes(mod.id),
+                })}
+                onClick={(e) => {
+                  if (e.shiftKey || e.ctrlKey) {
+                    setSelected((prev) => {
+                      if (prev.includes(mod.id)) {
+                        return prev.filter((id) => id !== mod.id);
+                      }
+                      return [...prev, mod.id];
+                    });
+                  }
+                }}
+              >
                 <Table.Cell>
                   <Link
                     to={`/$gameId/mods/$modId`}
@@ -106,18 +148,23 @@ function Mods(): JSX.Element {
                     {mod.name}
                   </Link>
                 </Table.Cell>
-                <Table.Cell className="overflow-ellipsis">
+                <Table.Cell
+                  className={`overflow-ellipsis ${
+                    modId != null ? "hidden" : "visible"
+                  }`}
+                >
                   {mod.description}
                 </Table.Cell>
                 <Table.Cell>{mod.author}</Table.Cell>
                 <Table.Cell>{mod.version}</Table.Cell>
                 <Table.Cell>
-                  <Checkbox
+                  <Switch
                     checked={mod.enabled}
                     onChange={() => {
                       void toggleMod(mod.id);
                     }}
-                  />
+                    label="Enable Mod"
+                  ></Switch>
                 </Table.Cell>
                 <Table.Cell>
                   <FetchModDetails modId={String(mod.id)} />
@@ -134,7 +181,9 @@ function Mods(): JSX.Element {
             ))}
           </Table.Body>
         </Table>
-        <Outlet />
+        <div>
+          <Outlet />
+        </div>
       </div>
     </div>
   );
@@ -155,13 +204,12 @@ function FetchModDetails({ modId }: { modId: string }): JSX.Element {
   });
 
   const onSubmit = handleSubmit(async (data) => {
-    const response = await invoke("download_mod_details", {
+    await invoke("download_mod_details", {
       modId: Number(modId),
       nexusModId: Number(data.modId),
     });
-    console.log({ response });
     setOpen(false);
-  }, console.log);
+  });
 
   return (
     <>

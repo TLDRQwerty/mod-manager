@@ -3,6 +3,7 @@ import { useQuery, UseQueryResult } from "react-query";
 import { modsRoute } from "./Mods";
 import { Mod as ModType } from "~/types";
 import { invoke } from "~/utils";
+import Image from "~/ui/Image";
 
 export const modRoute = new Route({
   getParentRoute: () => modsRoute,
@@ -31,8 +32,10 @@ function Mod(): JSX.Element {
   return (
     <div>
       <h1>{data?.name}</h1>
+      {data?.pictureUrl != null ? (
+        <Image className="w-[50%] aspect-auto" src={data?.pictureUrl} />
+      ) : null}
       <div>{data?.description}</div>
-      <img src={data?.pictureUrl} />
     </div>
   );
 }

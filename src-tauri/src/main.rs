@@ -17,6 +17,7 @@ fn main() {
             commands::create_update_game,
             commands::find_all_games,
             commands::find_all_mods_for_game,
+            commands::find_game,
             commands::find_mod,
             commands::delete_game,
             commands::add_mods,

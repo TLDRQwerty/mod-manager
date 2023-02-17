@@ -2,6 +2,7 @@ lockfileVersion: 5.4
 
 specifiers:
   '@headlessui/react': ^1.7.7
+  '@headlessui/tailwindcss': ^0.1.2
   '@hookform/resolvers': ^2.9.10
   '@tanstack/react-router': 0.0.1-beta.70
   '@tanstack/react-router-devtools': 0.0.1-beta.70
@@ -15,6 +16,7 @@ specifiers:
   '@vitejs/plugin-react': ^3.0.0
   autoprefixer: ^10.4.13
   class-variance-authority: ^0.4.0
+  clsx: ^1.2.1
   eslint: ^8.0.1
   eslint-config-prettier: ^8.6.0
   eslint-config-standard-with-typescript: ^27.0.1
@@ -38,6 +40,7 @@ specifiers:
 
 dependencies:
   '@headlessui/react': 1.7.7_biqbaboplfbrettd7655fr4n2y
+  '@headlessui/tailwindcss': 0.1.2_tailwindcss@3.2.4
   '@hookform/resolvers': 2.9.10_react-hook-form@7.42.1
   '@tanstack/react-router': 0.0.1-beta.70_biqbaboplfbrettd7655fr4n2y
   '@tanstack/react-router-devtools': 0.0.1-beta.70_biqbaboplfbrettd7655fr4n2y
@@ -45,6 +48,7 @@ dependencies:
   '@typescript-eslint/parser': 5.48.1_iukboom6ndih5an6iafl45j2fe
   autoprefixer: 10.4.13_postcss@8.4.21
   class-variance-authority: 0.4.0_typescript@4.9.4
+  clsx: 1.2.1
   postcss: 8.4.21
   react: 18.2.0
   react-dom: 18.2.0_react@18.2.0
@@ -534,6 +538,15 @@ packages:
       client-only: 0.0.1
       react: 18.2.0
       react-dom: 18.2.0_react@18.2.0
+    dev: false
+
+  /@headlessui/tailwindcss/0.1.2_tailwindcss@3.2.4:
+    resolution: {integrity: sha512-AQNESz+f1grCxifrocOE6hDMDFqhqY0g3xrSGOS0ocGkmVkssaBzXaAPAPNSs/nHmr4ZUhfl5THQpYrvaouWlQ==}
+    engines: {node: '>=10'}
+    peerDependencies:
+      tailwindcss: ^3.0
+    dependencies:
+      tailwindcss: 3.2.4_postcss@8.4.21
     dev: false
 
   /@hookform/resolvers/2.9.10_react-hook-form@7.42.1:
@@ -1207,6 +1220,11 @@ packages:
 
   /client-only/0.0.1:
     resolution: {integrity: sha512-IV3Ou0jSMzZrd3pZ48nLkT9DA7Ag1pnPzaiQhpW7c3RbcqqzvzzVu+L8gfqMp/8IM2MQtSiqaCxrrcfu8I8rMA==}
+    dev: false
+
+  /clsx/1.2.1:
+    resolution: {integrity: sha512-EcR6r5a8bj6pu3ycsa/E/cKVGuTgZJZdsyUYHOksG/UHIiKfjxzRxYJpyVBwYaQeOvghal9fcc4PidlgzugAQg==}
+    engines: {node: '>=6'}
     dev: false
 
   /color-convert/1.9.3:
