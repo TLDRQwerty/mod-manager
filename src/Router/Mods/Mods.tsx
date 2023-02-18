@@ -23,6 +23,9 @@ import { modRoute } from "./Mod";
 import Switch from "~/ui/Switch";
 import clsx from "clsx";
 import { rootRoute } from "../__root";
+import Form from "~/ui/Form";
+import Input from "~/ui/Input";
+import Field from "~/ui/Field";
 
 export const modsRoute = new Route({
   getParentRoute: () => rootRoute,
@@ -207,14 +210,15 @@ function FetchModDetails({ modId }: { modId: string }): JSX.Element {
       >
         <Dialog.Title>Fetch Mod Details</Dialog.Title>
         <div>
-          <form>
-            <label htmlFor="modId">Nexus Mod ID</label>
-            <input {...register("modId")} />
-            {errors.modId != null &&
-              typeof errors.modId.message === "string" && (
-                <p>{errors.modId.message}</p>
-              )}
-            <div className="flex flex-1 flex-row justify-between px-4">
+          <Form onSubmit={onSubmit}>
+            <Field
+              label="Nexus Mod ID"
+              id="modId"
+              error={errors.modId?.message}
+            >
+              <Input {...register("modId")} />
+            </Field>
+            <div className="pt-4 flex flex-1 flex-row justify-between px-4">
               <Button
                 intent="secondary"
                 onClick={() => {
@@ -223,11 +227,9 @@ function FetchModDetails({ modId }: { modId: string }): JSX.Element {
               >
                 Cancel
               </Button>
-              <Button type="submit" onClick={onSubmit}>
-                Fetch
-              </Button>
+              <Button type="submit">Fetch</Button>
             </div>
-          </form>
+          </Form>
         </div>
       </Dialog>
       <Button

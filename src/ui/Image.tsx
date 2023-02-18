@@ -1,9 +1,10 @@
+import clsx from "clsx";
 import { useState } from "react";
 import Dialog from "./Dialog";
 
 interface Props extends React.ImgHTMLAttributes<HTMLImageElement> {}
 
-export default function Image(props: Props): JSX.Element {
+export default function Image({ className, ...rest }: Props): JSX.Element {
   const [open, setOpen] = useState(false);
   return (
     <>
@@ -15,13 +16,14 @@ export default function Image(props: Props): JSX.Element {
           setOpen(false);
         }}
       >
-        <img {...props} className={"w-full h-full aspect-auto"} />
+        <img {...rest} className={"w-full h-full aspect-auto"} />
       </Dialog>
       <img
         onClick={() => {
           setOpen(true);
         }}
-        {...props}
+        className={clsx(className, "cursor-pointer")}
+        {...rest}
       />
     </>
   );

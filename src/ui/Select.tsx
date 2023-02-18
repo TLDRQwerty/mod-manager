@@ -37,11 +37,16 @@ export default function Select<T>({
         leaveFrom="transform scale-100 opacity-100"
         leaveTo="transform scale-95 opacity-0"
       >
-        <Listbox.Options
-          className={clsx("bg-gray-100 w-full p-2 rounded-md", itemClassName)}
-        >
+        <Listbox.Options className="fixed z-10 w-full bg-white rounded-md shadow-lg">
           {options.map((option) => (
-            <Listbox.Option key={getKey(option)} value={option}>
+            <Listbox.Option
+              key={getKey(option)}
+              value={option}
+              className={clsx(
+                "ui-active:bg-blue-500 ui-active:text-white ui-not-active:bg-white ui-not-active:text-black",
+                itemClassName
+              )}
+            >
               {renderOption(option)}
             </Listbox.Option>
           ))}
