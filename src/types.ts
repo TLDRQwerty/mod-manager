@@ -15,6 +15,7 @@ export interface Mod {
   version?: string;
   author?: string;
   enabled: boolean;
+  note?: string;
   pictureUrl?: string;
   cretedAt: number;
   updatedAt: number;

@@ -78,6 +78,19 @@ pub async fn create_update_game(
 }
 
 #[tauri::command]
+pub async fn update_mod_note(id: i32, note: String) -> Result<game_mod::Data, Error> {
+    let client = prisma::new_client().await.unwrap();
+
+    let game_mod = client
+        .game_mod()
+        .update(game_mod::id::equals(id), vec![game_mod::note::set(Some(note))])
+        .exec()
+        .await?;
+
+    Ok(game_mod)
+}
+
+#[tauri::command]
 pub async fn find_all_games() -> Result<Vec<game::Data>, Error> {
     let client = prisma::new_client().await.unwrap();
 

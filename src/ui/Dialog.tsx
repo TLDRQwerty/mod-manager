@@ -1,6 +1,7 @@
-import { ReactNode, Fragment } from "react";
+import { ReactNode, Fragment, useState, useEffect } from "react";
 import { Dialog as BaseDialog, Transition } from "@headlessui/react";
 import { cva, VariantProps } from "class-variance-authority";
+import Button from "./Button";
 
 const dialog = cva(
   "w-full transform overflow-hidden rounded-2xl bg-white text-left align-middle shadow-xl",
@@ -93,7 +94,48 @@ function Title({ children }: { children: ReactNode }): JSX.Element {
   );
 }
 
+function Description({ children }: { children: ReactNode }): JSX.Element {
+  return (
+    <BaseDialog.Description as="p" className="mt-2 text-sm text-gray-700">
+      {children}
+    </BaseDialog.Description>
+  );
+}
+
+function Warning({
+  description,
+  open,
+  destructiveAction,
+  children,
+  onClose,
+}: {
+  description: ReactNode;
+  open: boolean;
+  onClose: () => void;
+  destructiveAction: () => void;
+  children: ReactNode;
+}): JSX.Element {
+  return (
+    <>
+      <Dialog open={open} onClose={onClose}>
+        <Title>Warning</Title>
+        <Description>{description}</Description>
+        <div className="flex-row flex justify-between">
+          <Button onClick={onClose} intent="secondary">
+            Cancel
+          </Button>
+          <Button onClick={destructiveAction} intent="destructive">
+            Delete
+          </Button>
+        </div>
+      </Dialog>
+      {children}
+    </>
+  );
+}
+
 export default Object.assign(Dialog, {
   Title,
-  Description: BaseDialog.Description,
+  Description,
+  Warning,
 });

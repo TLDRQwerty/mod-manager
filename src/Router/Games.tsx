@@ -10,7 +10,9 @@ import Button from "~/ui/Button";
 import Dialog from "~/ui/Dialog";
 import Input from "~/ui/Input";
 import Table from "~/ui/Table";
-import { invoke } from "~/utils";
+import { invoke, useInvokeMutation, useInvokeQuery } from "~/utils";
+import Field from "~/ui/Field";
+import Form from "~/ui/Form";
 
 export const gamesRoute = new Route({
   getParentRoute: () => rootRoute,
@@ -18,16 +20,8 @@ export const gamesRoute = new Route({
   component: Games,
 });
 
-async function fetchGames(): Promise<Game[]> {
-  const response = await invoke<Game[]>("find_all_games", {});
-  if (typeof response === "string") {
-    throw new Error(response);
-  }
-  return response;
-}
-
 function useFetchGames(): UseQueryResult<Game[], unknown> {
-  return useQuery(["find_all_games"], fetchGames);
+  return useInvokeQuery<Game[]>("find_all_games");
 }
 
 const addGameSchema = z.object({
@@ -40,6 +34,7 @@ function Games(): JSX.Element {
   const { data, isLoading } = useFetchGames();
 
   const [dialogOpen, setDialogOpen] = useState(false);
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [gameId, setGameId] = useState<number | null>(null);
 
   const {
@@ -58,9 +53,7 @@ function Games(): JSX.Element {
     setDialogOpen(false);
   });
 
-  const handleDelete = async (gameId: number): Promise<void> => {
-    await invoke("delete_game", { gameId });
-  };
+  const deleteMutation = useInvokeMutation("delete_game");
 
   const handleEdit = ({
     id,
@@ -68,6 +61,7 @@ function Games(): JSX.Element {
     gameModFolderPath,
     nexusGameIdentifier,
   }: Game): void => {
+    reset();
     setGameId(id);
     setValue("name", name);
     setValue("modFolderPath", gameModFolderPath);
@@ -80,7 +74,7 @@ function Games(): JSX.Element {
   }
   return (
     <div>
-      <h3>Welcome Home!</h3>
+      <h1>Games List</h1>
       <Button
         onClick={() => {
           setDialogOpen(true);
@@ -95,36 +89,41 @@ function Games(): JSX.Element {
         }}
       >
         <Dialog.Title>Add Game</Dialog.Title>
-        <p>{String(gameId)}</p>
-        <label htmlFor="name">Name</label>
-        <Input {...register("name")} />
-        {errors.name != null && typeof errors.name.message === "string" && (
-          <p>{errors.name.message}</p>
-        )}
-        <label htmlFor="modFolderPath">Mods Path</label>
-        <Input {...register("modFolderPath")} />
-        {errors.modFolderPath != null &&
-          typeof errors.modFolderPath.message === "string" && (
-            <p>{errors.modFolderPath.message}</p>
-          )}
-        <label htmlFor="nexusGameIdentifier">Nexus Game ID</label>
-        <Input {...register("nexusGameIdentifier")} />
-        {errors.modFolderPath != null &&
-          typeof errors.modFolderPath.message === "string" && (
-            <p>{errors.modFolderPath.message}</p>
-          )}
-        <div className="flex flex-1 justify-between">
-          <Button
-            onClick={() => {
-              setDialogOpen(false);
-            }}
+        <Dialog.Description>
+          Add a new game to be managed by the mod manager.
+        </Dialog.Description>
+        <Form onSubmit={onSubmit}>
+          <Field label="Name" id="name" error={errors.name?.message}>
+            <Input {...register("name")} />
+          </Field>
+          <Field
+            id="modFolderPath"
+            label="Mod Path"
+            error={errors.modFolderPath?.message}
           >
-            Cancel
-          </Button>
-          <Button onClick={onSubmit}>
-            {gameId != null ? "Update" : "Create"}
-          </Button>
-        </div>
+            <Input {...register("modFolderPath")} />
+          </Field>
+          <Field
+            id="nexusGameIdentifier"
+            label="Nexus Game ID"
+            error={errors.modFolderPath?.message}
+          >
+            <Input {...register("nexusGameIdentifier")} />
+          </Field>
+          <div className="flex flex-1 justify-between pt-4">
+            <Button
+              intent="secondary"
+              onClick={() => {
+                setDialogOpen(false);
+              }}
+            >
+              Cancel
+            </Button>
+            <Button type="submit">
+              {gameId != null ? "Update" : "Create"}
+            </Button>
+          </div>
+        </Form>
       </Dialog>
 
       <Table>
@@ -132,7 +131,7 @@ function Games(): JSX.Element {
           <Table.Row>
             <Table.Header>Name</Table.Header>
             <Table.Header>Mods Path</Table.Header>
-            <th />
+            <div />
           </Table.Row>
         </Table.Head>
         <Table.Body>
@@ -145,13 +144,25 @@ function Games(): JSX.Element {
               </Table.Cell>
               <Table.Cell>{game.gameModFolderPath}</Table.Cell>
               <Table.Cell>
-                <Button
-                  onClick={() => {
-                    void handleDelete(game.id);
+                <Dialog.Warning
+                  open={deleteDialogOpen}
+                  description="This will delete the game and disable all the enabled mods"
+                  destructiveAction={() => {
+                    deleteMutation.mutate({ gameId: game.id });
+                  }}
+                  onClose={() => {
+                    setDeleteDialogOpen(false);
                   }}
                 >
-                  Delete
-                </Button>
+                  <Button
+                    onClick={() => {
+                      setDeleteDialogOpen(true);
+                    }}
+                    intent="destructive"
+                  >
+                    Delete
+                  </Button>
+                </Dialog.Warning>
                 <Button
                   onClick={() => {
                     handleEdit({ ...game });

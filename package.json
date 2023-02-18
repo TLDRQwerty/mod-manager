@@ -8,14 +8,15 @@
     "build": "tsc && vite build",
     "preview": "vite preview",
     "tauri": "tauri",
-    "lint": "eslint --ext .js,.jsx,.ts,.tsx,.vue src"
+    "lint": "eslint --ext .js,.jsx,.ts,.tsx,.vue src",
+    "tsc": "tsc"
   },
   "dependencies": {
     "@headlessui/react": "^1.7.7",
     "@headlessui/tailwindcss": "^0.1.2",
     "@hookform/resolvers": "^2.9.10",
-    "@tanstack/react-router": "0.0.1-beta.70",
-    "@tanstack/react-router-devtools": "0.0.1-beta.70",
+    "@tanstack/react-router": "0.0.1-beta.83",
+    "@tanstack/react-router-devtools": "0.0.1-beta.83",
     "@tauri-apps/api": "^1.2.0",
     "@typescript-eslint/parser": "^5.48.1",
     "autoprefixer": "^10.4.13",

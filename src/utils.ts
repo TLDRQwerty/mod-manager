@@ -26,19 +26,22 @@ type COMMANDS = (typeof COMMANDS)[keyof typeof COMMANDS];
 
 export function useInvokeQuery<T>(
   command: COMMANDS,
-  args: Record<string, unknown>
-): UseQueryResult<T | string> {
-  return useQuery<T | string>(
-    [command, ...Object.values(args)],
-    async () => await invoke<T>(command, args)
-  );
+  args: Record<string, unknown> = {}
+): UseQueryResult<T> {
+  return useQuery<T>([command, ...Object.values(args)], async () => {
+    const result = await invoke<T | string>(command, args);
+    if (typeof result === "string") {
+      throw new Error(result);
+    }
+    return result;
+  });
 }
 
-export function useInvokeMutation<T>(
+export function useInvokeMutation<T, A = Record<string, unknown>>(
   command: COMMANDS,
   options?: UseMutationOptions<T | string>
-): UseMutationResult<T> {
-  return useMutation<T | string>(async (args: Record<string, unknown>) => {
+): UseMutationResult<T, unknown, A> {
+  return useMutation<T, unknown, A>(async (args: A) => {
     return await invoke<T>(command, args);
   }, options);
 }

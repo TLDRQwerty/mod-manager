@@ -1,51 +1,59 @@
+import clsx from "clsx";
 import React from "react";
 
-function Table({
-  ...props
-}: React.TableHTMLAttributes<HTMLTableElement>): JSX.Element {
+interface Props extends React.HTMLAttributes<HTMLDivElement> {
+  className?: string;
+  children?: React.ReactNode;
+}
+
+function Table({ className, children, ...rest }: Props): JSX.Element {
   return (
-    <table
-      className="border-collapse border border-gray-300 w-full"
-      {...props}
-    />
+    <div className={clsx("grid grid-template-cols")} {...rest}>
+      {children}
+    </div>
   );
 }
 
-function Head({
-  ...props
-}: React.DetailedHTMLProps<
-  React.HTMLAttributes<HTMLTableSectionElement>,
-  HTMLTableSectionElement
->): JSX.Element {
-  return <thead className="border border-gray-300" {...props} />;
+function Head({ children, className, ...rest }: Props): JSX.Element {
+  return (
+    <div className={clsx("bg-gray-200 font-bold", className)} {...rest}>
+      {children}
+    </div>
+  );
 }
 
-function Body({
-  ...props
-}: React.DetailedHTMLProps<
-  React.HTMLAttributes<HTMLTableSectionElement>,
-  HTMLTableSectionElement
->): JSX.Element {
-  return <tbody className="border border-gray-300" {...props} />;
+function Body({ children, ...rest }: Props): JSX.Element {
+  return <div {...rest}>{children}</div>;
 }
 
-function Row({
-  ...props
-}: React.TableHTMLAttributes<HTMLTableRowElement>): JSX.Element {
-  return <tr className="border border-gray-300" {...props} />;
+function Row({ children, className, ...rest }: Props): JSX.Element {
+  return (
+    <div
+      className={clsx(
+        "items-center grid gap-4 border-b border-black grid-cols-[repeat(auto-fit,minmax(20px,_1fr))] hover:bg-gray-300/25",
+        className
+      )}
+      {...rest}
+    >
+      {children}
+    </div>
+  );
 }
 
-function Cell({
-  ...props
-}: React.TableHTMLAttributes<HTMLTableCellElement>): JSX.Element {
-  return <td className="border border-gray-300" {...props} />;
+function Cell({ children, className, ...rest }: Props): JSX.Element {
+  return (
+    <div className={clsx(className)} {...rest}>
+      {children}
+    </div>
+  );
 }
 
-function Header({
-  className = "",
-  ...props
-}: React.TableHTMLAttributes<HTMLTableCellElement>): JSX.Element {
-  return <th className={`border border-gray-300 ${className}`} {...props} />;
+function Header({ children, className, ...rest }: Props): JSX.Element {
+  return (
+    <div className={clsx(className)} {...rest} {...rest}>
+      {children}
+    </div>
+  );
 }
 
 export default Object.assign(Table, {

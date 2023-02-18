@@ -3,6 +3,7 @@ import {
   Link,
   Outlet,
   Route,
+  useNavigate,
   useParams,
   useRouter,
 } from "@tanstack/react-router";
@@ -14,52 +15,27 @@ import Checkbox from "~/ui/Checkbox";
 import Dialog from "~/ui/Dialog";
 import { DragDrop } from "~/ui/DragDrop";
 import Table from "~/ui/Table";
-import { invoke, useInvokeMutation } from "~/utils";
+import { invoke, useInvokeMutation, useInvokeQuery } from "~/utils";
 import { gamesRoute } from "../Games";
 import * as z from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { modRoute } from "./Mod";
 import Switch from "~/ui/Switch";
 import clsx from "clsx";
+import { rootRoute } from "../__root";
 
 export const modsRoute = new Route({
-  getParentRoute: () => gamesRoute,
+  getParentRoute: () => rootRoute,
   path: "$gameId/mods",
   component: Mods,
 });
 
-async function fetchMods(gameId: string): Promise<Mod[]> {
-  const response = await invoke<Mod[]>("find_all_mods_for_game", {
-    gameId: parseInt(gameId, 10),
-  });
-
-  if (typeof response === "string") {
-    throw new Error(response);
-  }
-  return response;
+function useFetchMods(gameId: number): UseQueryResult<Mod[], unknown> {
+  return useInvokeQuery("find_all_mods_for_game", { gameId });
 }
 
-function useFetchMods(gameId: string): UseQueryResult<Mod[], unknown> {
-  return useQuery(
-    ["find_all_mods_for_game", gameId],
-    async () => await fetchMods(gameId)
-  );
-}
-
-async function fetchGame(gameId: string): Promise<Game> {
-  const response = await invoke<Game>("find_game", {
-    gameId: parseInt(gameId, 10),
-  });
-
-  if (typeof response === "string") {
-    throw new Error(response);
-  }
-
-  return response;
-}
-
-function useFindGame(gameId: string): UseQueryResult<Game, unknown> {
-  return useQuery(["find_game", gameId], async () => await fetchGame(gameId));
+function useFindGame(gameId: number): UseQueryResult<Game, unknown> {
+  return useInvokeQuery("find_game", { gameId });
 }
 
 function AddMods(): JSX.Element {
@@ -89,33 +65,45 @@ function AddMods(): JSX.Element {
 }
 
 function Mods(): JSX.Element {
+  const navigation = useNavigate();
   const { modId, gameId } = useParams({ from: modRoute.id });
-  const { data } = useFetchMods(gameId);
-  const { data: game } = useFindGame(gameId);
+  const { data } = useFetchMods(parseInt(gameId, 10));
+  const { data: game } = useFindGame(parseInt(gameId, 10));
   const [selected, setSelected] = useState<number[]>([]);
+  const deleteMod = useInvokeMutation("delete_mod", {
+    onSuccess: async (_, vars) => {
+      if (vars?.modId === modId) {
+        await navigation({
+          to: `/$gameId/mods`,
+          params: { gameId },
+          replace: true,
+        });
+      }
+    },
+  });
 
   const toggleMod = useInvokeMutation("toggle_mod");
   return (
-    <div>
+    <div className="max-h-screen">
       <h1>{game.name} Mods</h1>
 
       <AddMods />
 
-      <div className={modId != null ? "grid grid-cols-2" : undefined}>
-        <Table className="w-full h-full overflow-y">
+      <div
+        className={clsx(modId != null ? "grid grid-cols-2 gap-4" : undefined)}
+      >
+        <Table className="h-min">
           <Table.Head>
             <Table.Row>
               <Table.Header>Name</Table.Header>
               <Table.Header
-                className={`w-1/3 overflow-ellipsis ${modId != null ? "hidden" : "visible"
-                  }`}
+                className={clsx(modId != null ? "hidden" : "visible")}
               >
                 Description
               </Table.Header>
               <Table.Header>Author</Table.Header>
               <Table.Header>Version</Table.Header>
-              <Table.Header>Enabled</Table.Header>
-              <th />
+              <div />
             </Table.Row>
           </Table.Head>
           <Table.Body>
@@ -140,13 +128,18 @@ function Mods(): JSX.Element {
                   <Link
                     to={`/$gameId/mods/$modId`}
                     params={{ gameId, modId: String(mod.id) }}
+                    activeProps={{
+                      className: "font-bold",
+                    }}
                   >
                     {mod.name}
                   </Link>
                 </Table.Cell>
                 <Table.Cell
-                  className={`overflow-ellipsis ${modId != null ? "hidden" : "visible"
-                    }`}
+                  className={clsx(
+                    "overflow-hidden whitespace-nowrap overflow-ellipsis",
+                    modId != null ? "hidden" : "visible"
+                  )}
                 >
                   {mod.description}
                 </Table.Cell>
@@ -160,13 +153,11 @@ function Mods(): JSX.Element {
                     }}
                     label="Enable Mod"
                   ></Switch>
-                </Table.Cell>
-                <Table.Cell>
                   <FetchModDetails modId={String(mod.id)} />
                   <Button
                     intent="destructive"
                     onClick={() => {
-                      void invoke("delete_mod", { modId: mod.id });
+                      deleteMod.mutate({ modId: mod.id });
                     }}
                   >
                     Delete
@@ -176,7 +167,7 @@ function Mods(): JSX.Element {
             ))}
           </Table.Body>
         </Table>
-        <div>
+        <div className="h-min max-h-[60vh] overflow-y-scroll">
           <Outlet />
         </div>
       </div>

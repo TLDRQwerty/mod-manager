@@ -26,6 +26,7 @@ fn main() {
             commands::disable_mod,
             commands::download_mod_details,
             commands::toggle_mod,
+            commands::update_mod_note
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

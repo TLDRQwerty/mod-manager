@@ -32,7 +32,7 @@ model GameMod {
   enabled           Boolean @default(false)
   pictureUrl        String?
 
-  notes             String?
+  note              String?
 
   relativeArchivePath String?
   relativeFolderPath  String?
