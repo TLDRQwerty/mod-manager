@@ -1,6 +1,6 @@
 use std::path::Path;
 
-use bbcode::BBCode;
+use bbclash::bbcode_to_html;
 use prisma::{game, game_mod};
 use prisma_client_rust::{NewClientError, QueryError};
 use std::fs::File;
@@ -508,10 +508,6 @@ pub async fn download_mod_details(mod_id: i32, nexus_mod_id: i32) -> Result<game
                     .get_mod_details(nexus_game_identifier, nexus_mod_id)
                     .await;
 
-                let a = mod_details.description.as_str().as_html();
-
-                println!("a: {}", a);
-
                 let game_mod = client
                     .game_mod()
                     .update(
@@ -519,7 +515,7 @@ pub async fn download_mod_details(mod_id: i32, nexus_mod_id: i32) -> Result<game
                         vec![
                             game_mod::name::set(mod_details.name),
                             game_mod::summary::set(Some(mod_details.summary)),
-                            game_mod::description::set(Some(mod_details.description)),
+                            game_mod::description::set(Some(bbcode_to_html(&mod_details.description))),
                             game_mod::version::set(Some(mod_details.version)),
                             game_mod::author::set(Some(mod_details.author)),
                             game_mod::picture_url::set(Some(mod_details.picture_url)),

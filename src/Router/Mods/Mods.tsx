@@ -14,7 +14,7 @@ import Checkbox from "~/ui/Checkbox";
 import Dialog from "~/ui/Dialog";
 import { DragDrop } from "~/ui/DragDrop";
 import Table from "~/ui/Table";
-import { invoke } from "~/utils";
+import { invoke, useInvokeMutation } from "~/utils";
 import { gamesRoute } from "../Games";
 import * as z from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -94,10 +94,7 @@ function Mods(): JSX.Element {
   const { data: game } = useFindGame(gameId);
   const [selected, setSelected] = useState<number[]>([]);
 
-  const toggleMod = async (modId: number): Promise<void> => {
-    void (await invoke("toggle_mod", { modId }));
-  };
-
+  const toggleMod = useInvokeMutation("toggle_mod");
   return (
     <div>
       <h1>{game.name} Mods</h1>
@@ -110,9 +107,8 @@ function Mods(): JSX.Element {
             <Table.Row>
               <Table.Header>Name</Table.Header>
               <Table.Header
-                className={`w-1/3 overflow-ellipsis ${
-                  modId != null ? "hidden" : "visible"
-                }`}
+                className={`w-1/3 overflow-ellipsis ${modId != null ? "hidden" : "visible"
+                  }`}
               >
                 Description
               </Table.Header>
@@ -149,9 +145,8 @@ function Mods(): JSX.Element {
                   </Link>
                 </Table.Cell>
                 <Table.Cell
-                  className={`overflow-ellipsis ${
-                    modId != null ? "hidden" : "visible"
-                  }`}
+                  className={`overflow-ellipsis ${modId != null ? "hidden" : "visible"
+                    }`}
                 >
                   {mod.description}
                 </Table.Cell>
@@ -161,7 +156,7 @@ function Mods(): JSX.Element {
                   <Switch
                     checked={mod.enabled}
                     onChange={() => {
-                      void toggleMod(mod.id);
+                      toggleMod.mutate({ modId: mod.id });
                     }}
                     label="Enable Mod"
                   ></Switch>

@@ -35,7 +35,7 @@ function Mod(): JSX.Element {
       {data?.pictureUrl != null ? (
         <Image className="w-[50%] aspect-auto" src={data?.pictureUrl} />
       ) : null}
-      <div>{data?.description}</div>
+      <div dangerouslySetInnerHTML={{ __html: data?.description ?? "" }} />
     </div>
   );
 }

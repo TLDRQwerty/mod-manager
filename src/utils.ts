@@ -1,4 +1,11 @@
 import { invoke as baseInvoke } from "@tauri-apps/api";
+import {
+  useMutation,
+  UseMutationOptions,
+  UseMutationResult,
+  useQuery,
+  UseQueryResult,
+} from "react-query";
 
 const COMMANDS = {
   create_update_game: "create_update_game",
@@ -16,6 +23,25 @@ const COMMANDS = {
 } as const;
 
 type COMMANDS = (typeof COMMANDS)[keyof typeof COMMANDS];
+
+export function useInvokeQuery<T>(
+  command: COMMANDS,
+  args: Record<string, unknown>
+): UseQueryResult<T | string> {
+  return useQuery<T | string>(
+    [command, ...Object.values(args)],
+    async () => await invoke<T>(command, args)
+  );
+}
+
+export function useInvokeMutation<T>(
+  command: COMMANDS,
+  options?: UseMutationOptions<T | string>
+): UseMutationResult<T> {
+  return useMutation<T | string>(async (args: Record<string, unknown>) => {
+    return await invoke<T>(command, args);
+  }, options);
+}
 
 export async function invoke<T>(
   command: COMMANDS,
