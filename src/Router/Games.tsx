@@ -26,7 +26,7 @@ function useFetchGames(): UseQueryResult<Game[], unknown> {
 
 const addGameSchema = z.object({
   name: z.string().min(1),
-  modFolderPath: z.string().min(1),
+  gameModFolderPath: z.string().min(1),
   nexusGameIdentifier: z.string().optional(),
 });
 
@@ -64,7 +64,7 @@ function Games(): JSX.Element {
     reset();
     setGameId(id);
     setValue("name", name);
-    setValue("modFolderPath", gameModFolderPath);
+    setValue("gameModFolderPath", gameModFolderPath);
     setValue("nexusGameIdentifier", nexusGameIdentifier);
     setDialogOpen(true);
   };
@@ -97,16 +97,16 @@ function Games(): JSX.Element {
             <Input {...register("name")} />
           </Field>
           <Field
-            id="modFolderPath"
+            id="gameModFolderPath"
             label="Mod Path"
-            error={errors.modFolderPath?.message}
+            error={errors.gameModFolderPath?.message}
           >
-            <Input {...register("modFolderPath")} />
+            <Input {...register("gameModFolderPath")} />
           </Field>
           <Field
             id="nexusGameIdentifier"
             label="Nexus Game ID"
-            error={errors.modFolderPath?.message}
+            error={errors.gameModFolderPath?.message}
           >
             <Input {...register("nexusGameIdentifier")} />
           </Field>

@@ -26,6 +26,7 @@ import { rootRoute } from "../__root";
 import Form from "~/ui/Form";
 import Input from "~/ui/Input";
 import Field from "~/ui/Field";
+import Editor from "~/ui/Editor";
 
 export const modsRoute = new Route({
   getParentRoute: () => rootRoute,
@@ -86,10 +87,23 @@ function Mods(): JSX.Element {
   });
 
   const toggleMod = useInvokeMutation("toggle_mod");
+  const updateNote = useInvokeMutation("create_update_game");
   return (
     <div className="max-h-screen">
       <h1>{game.name} Mods</h1>
 
+      <Editor
+        value={game?.note}
+        onChange={(note) => {
+          updateNote.mutate({
+            id: parseInt(gameId, 10),
+            note,
+            gameModFolderPath: game?.gameModFolderPath,
+            name: game?.name,
+            nexusGameIdentifier: game?.nexusGameIdentifier,
+          });
+        }}
+      />
       <AddMods />
 
       <div

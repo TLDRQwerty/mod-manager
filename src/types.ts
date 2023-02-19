@@ -3,6 +3,7 @@ export interface Game {
   name: string;
   gameModFolderPath: string[];
   nexusGameIdentifier: string;
+  note?: string;
   createdAt: number;
   updatedAt: number;
 }

@@ -47,8 +47,9 @@ impl serde::Serialize for Error {
 pub async fn create_update_game(
     id: Option<i32>,
     name: String,
-    mod_folder_path: String,
+    game_mod_folder_path: String,
     nexus_game_identifier: Option<String>,
+    note: Option<String>,
 ) -> Result<game::Data, Error> {
     let client = prisma::new_client().await.unwrap();
 
@@ -59,8 +60,9 @@ pub async fn create_update_game(
                 game::id::equals(id),
                 vec![
                     game::name::set(name),
-                    game::game_mod_folder_path::set(mod_folder_path),
+                    game::game_mod_folder_path::set(game_mod_folder_path),
                     game::nexus_game_identifier::set(nexus_game_identifier),
+                    game::note::set(note),
                 ],
             )
             .exec()
@@ -70,7 +72,7 @@ pub async fn create_update_game(
     } else {
         let game = client
             .game()
-            .create(name, mod_folder_path, vec![])
+            .create(name, game_mod_folder_path, vec![])
             .exec()
             .await?;
         Ok(game)
@@ -83,7 +85,10 @@ pub async fn update_mod_note(id: i32, note: String) -> Result<game_mod::Data, Er
 
     let game_mod = client
         .game_mod()
-        .update(game_mod::id::equals(id), vec![game_mod::note::set(Some(note))])
+        .update(
+            game_mod::id::equals(id),
+            vec![game_mod::note::set(Some(note))],
+        )
         .exec()
         .await?;
 
@@ -125,8 +130,8 @@ pub async fn delete_game(game_id: i32) -> Result<game::Data, Error> {
             Some(p) => p,
             None => {
                 return Err(Error::StringError(
-                        "Game install path not found".to_string(),
-                        ))
+                    "Game install path not found".to_string(),
+                ))
             }
         };
         if game_mod.enabled {
@@ -528,7 +533,9 @@ pub async fn download_mod_details(mod_id: i32, nexus_mod_id: i32) -> Result<game
                         vec![
                             game_mod::name::set(mod_details.name),
                             game_mod::summary::set(Some(mod_details.summary)),
-                            game_mod::description::set(Some(bbcode_to_html(&mod_details.description))),
+                            game_mod::description::set(Some(bbcode_to_html(
+                                &mod_details.description,
+                            ))),
                             game_mod::version::set(Some(mod_details.version)),
                             game_mod::author::set(Some(mod_details.author)),
                             game_mod::picture_url::set(Some(mod_details.picture_url)),
