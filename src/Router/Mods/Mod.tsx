@@ -26,6 +26,9 @@ function Mod(): JSX.Element {
   return (
     <>
       <h1>{data?.name}</h1>
+      {data?.pictureUrl != null ? (
+        <Image className="w-[50%] aspect-auto" src={data?.pictureUrl} />
+      ) : null}
       <Editor
         value={note}
         onChange={(value) => {
@@ -33,9 +36,7 @@ function Mod(): JSX.Element {
           updateNote.mutate({ id: parseInt(modId, 10), note: value });
         }}
       />
-      {data?.pictureUrl != null ? (
-        <Image className="w-[50%] aspect-auto" src={data?.pictureUrl} />
-      ) : null}
+      <h2>Description</h2>
       {data?.description != null ? (
         <HTMLRender value={data?.description} />
       ) : null}

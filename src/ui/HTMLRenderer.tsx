@@ -38,8 +38,9 @@ class HTMLParser {
   pTagToReactElement(node: HTMLParagraphElement): ReactElement {
     if (BB_CODE_REGEX.test(node.textContent ?? "")) {
       return <Fragment />;
+    } else {
+      return <p>{node.textContent}</p>;
     }
-    return <p>{node.textContent}</p>;
   }
 
   parse(): ReactElement {

@@ -109,7 +109,7 @@ function Mods(): JSX.Element {
       <div
         className={clsx(modId != null ? "grid grid-cols-2 gap-4" : undefined)}
       >
-        <Table className="h-min">
+        <Table className="h-min select-none">
           <Table.Head>
             <Table.Row>
               <Table.Header>Name</Table.Header>

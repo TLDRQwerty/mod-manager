@@ -60,7 +60,7 @@ export default function Editor({
 
   return (
     <>
-      <div className="flex flex-row flex-1">
+      <div className="flex flex-row">
         <ToggleButton
           onClick={() => editor.chain().focus().toggleBold().run()}
           active={editor.isActive("bold")}
