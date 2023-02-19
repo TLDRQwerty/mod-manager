@@ -61,7 +61,7 @@ class HTMLParser {
             const text = node.textContent;
             const matches = text.match(BB_CODE_REGEX);
             if (matches == null) {
-              children.push(<Fragment>{text}</Fragment>);
+              children.push(<Fragment key={text}>{text}</Fragment>);
             }
           }
           break;

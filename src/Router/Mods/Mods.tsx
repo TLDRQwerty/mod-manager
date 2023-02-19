@@ -27,6 +27,7 @@ import Form from "~/ui/Form";
 import Input from "~/ui/Input";
 import Field from "~/ui/Field";
 import Editor from "~/ui/Editor";
+import FetchModDetails from "~/FetchModDetails";
 
 export const modsRoute = new Route({
   getParentRoute: () => rootRoute,
@@ -114,13 +115,13 @@ function Mods(): JSX.Element {
             <Table.Row>
               <Table.Header>Name</Table.Header>
               <Table.Header
-                className={clsx(modId != null ? "hidden" : "visible")}
+                className={clsx(modId != null ? "hidden" : "block")}
               >
                 Description
               </Table.Header>
               <Table.Header>Author</Table.Header>
               <Table.Header>Version</Table.Header>
-              <div />
+              <div className={clsx(modId != null ? "hidden" : "block")} />
             </Table.Row>
           </Table.Head>
           <Table.Body>
@@ -155,14 +156,16 @@ function Mods(): JSX.Element {
                 <Table.Cell
                   className={clsx(
                     "overflow-hidden overflow-ellipsis whitespace-nowrap",
-                    modId != null ? "hidden" : "visible"
+                    modId != null ? "hidden" : "block"
                   )}
                 >
                   {mod.description}
                 </Table.Cell>
                 <Table.Cell>{mod.author}</Table.Cell>
                 <Table.Cell>{mod.version}</Table.Cell>
-                <Table.Cell>
+                <Table.Cell
+                  className={clsx(modId != null ? "hidden" : "block")}
+                >
                   <Switch
                     checked={mod.enabled}
                     onChange={() => {
@@ -192,67 +195,3 @@ function Mods(): JSX.Element {
   );
 }
 
-const fetchModDetailsSchema = z.object({
-  modId: z.string(),
-});
-
-function FetchModDetails({ modId }: { modId: string }): JSX.Element {
-  const [open, setOpen] = useState(false);
-  const {
-    register,
-    handleSubmit,
-    formState: { errors },
-  } = useForm({
-    resolver: zodResolver(fetchModDetailsSchema),
-  });
-
-  const onSubmit = handleSubmit(async (data) => {
-    await invoke("download_mod_details", {
-      modId: Number(modId),
-      nexusModId: Number(data.modId),
-    });
-    setOpen(false);
-  });
-
-  return (
-    <>
-      <Dialog
-        open={open}
-        onClose={() => {
-          setOpen(false);
-        }}
-      >
-        <Dialog.Title>Fetch Mod Details</Dialog.Title>
-        <div>
-          <Form onSubmit={onSubmit}>
-            <Field
-              label="Nexus Mod ID"
-              id="modId"
-              error={errors.modId?.message}
-            >
-              <Input {...register("modId")} />
-            </Field>
-            <div className="flex flex-1 flex-row justify-between px-4 pt-4">
-              <Button
-                intent="secondary"
-                onClick={() => {
-                  setOpen(false);
-                }}
-              >
-                Cancel
-              </Button>
-              <Button type="submit">Fetch</Button>
-            </div>
-          </Form>
-        </div>
-      </Dialog>
-      <Button
-        onClick={() => {
-          setOpen(true);
-        }}
-      >
-        Fetch Mod Details
-      </Button>
-    </>
-  );
-}

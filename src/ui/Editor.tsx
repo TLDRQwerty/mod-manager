@@ -32,9 +32,12 @@ function ToggleButton({
 }): JSX.Element {
   return (
     <button
-      className={clsx("rounded-md border border-black px-2 py-1", {
-        "bg-gray-800 text-white": active,
-      })}
+      className={clsx(
+        "rounded-md border border-black px-2 py-1 hover:bg-gray-200/50",
+        {
+          "bg-gray-800 text-white hover:bg-gray-900/75": active,
+        }
+      )}
       {...props}
     >
       {children}
@@ -60,7 +63,7 @@ export default function Editor({
 
   return (
     <>
-      <div className="flex flex-row">
+      <div className="flex flex-row space-x-1">
         <ToggleButton
           onClick={() => editor.chain().focus().toggleBold().run()}
           active={editor.isActive("bold")}
@@ -128,7 +131,7 @@ export default function Editor({
       </div>
       <EditorContent
         editor={editor}
-        className="m-2 rounded-lg border border-gray-200 p-2"
+        className="z-1 m-2 rounded-lg border border-gray-200 p-2"
       />
     </>
   );

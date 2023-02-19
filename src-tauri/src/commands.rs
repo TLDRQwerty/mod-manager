@@ -8,7 +8,7 @@ use tauri::{generate_context, State};
 use tempfile::Builder;
 use tokio::fs::symlink;
 
-use crate::prisma::{self, game_mod::relative_folder_path};
+use crate::prisma::{self, config, game_mod::relative_folder_path};
 
 #[derive(thiserror::Error, Debug)]
 pub enum Error {
@@ -477,6 +477,57 @@ pub async fn toggle_mod(mod_id: i32) -> Result<game_mod::Data, Error> {
     }
 }
 
+#[tauri::command]
+pub async fn create_update_config(key: String, value: String) -> Result<config::Data, Error> {
+    let client = prisma::new_client().await.unwrap();
+
+    let config = client
+        .config()
+        .find_first(vec![config::key::equals(key.clone())])
+        .exec()
+        .await?;
+
+    return match config {
+        Some(config) => Ok(client
+            .config()
+            .update(
+                config::id::equals(config.id),
+                vec![config::key::set(key), config::value::set(value)],
+            )
+            .exec()
+            .await?),
+        None => Ok(client.config().create(key, value, vec![]).exec().await?),
+    };
+}
+
+#[tauri::command]
+pub async fn delete_config(key: String) -> Result<config::Data, Error> {
+    let client = prisma::new_client().await.unwrap();
+
+    Ok(client
+        .config()
+        .delete(config::key::equals(key))
+        .exec()
+        .await?)
+}
+
+#[tauri::command]
+pub async fn find_config(key: String) -> Result<Option<config::Data>, Error> {
+    let client = prisma::new_client().await.unwrap();
+
+    let config = client
+        .config()
+        .find_first(vec![config::key::equals(key)])
+        .exec()
+        .await?;
+
+    if let Some(config) = config {
+        Ok(Some(config))
+    } else {
+        Ok(None)
+    }
+}
+
 async fn download_mod_from_url(url: String) -> String {
     let tmp_dir = Builder::new().prefix("temp").tempdir().unwrap();
     let response = reqwest::get(url).await.unwrap();
@@ -515,11 +566,7 @@ pub async fn download_mod_details(mod_id: i32, nexus_mod_id: i32) -> Result<game
             .await?;
 
         if let Some(game) = game {
-            let api_key: Option<&'static str> = option_env!("NEXUS_API_KEY");
-            if api_key.is_none() {
-                return Err(Error::StringError("NEXUS_API_KEY is not set".to_string()));
-            }
-            let nexus_integration = NexusIntegration::new(api_key.unwrap().to_string());
+            let nexus_integration = NexusIntegration::new().await?;
 
             if let Some(nexus_game_identifier) = game.nexus_game_identifier {
                 let mod_details = nexus_integration
@@ -602,8 +649,19 @@ struct ModDetailReponse {
 
 impl NexusIntegration {
     const NEXUS_API_ROUTE: &str = "https://api.nexusmods.com/v1";
-    fn new(api_key: String) -> Self {
-        Self { api_key }
+    async fn new() -> Result<Self, Error> {
+        let client = prisma::new_client().await?;
+        let config = client
+            .config()
+            .find_first(vec![config::key::equals(String::from("NEXUS_API_KEY"))])
+            .exec()
+            .await?;
+        match config {
+            Some(config) => Ok(Self {
+                api_key: config.value
+            }),
+            None => Err(Error::StringError("Nexus API Key not set".to_string())),
+        }
     }
 
     async fn get_mod_details(self: Self, game_identifier: String, mod_id: i32) -> ModDetailReponse {

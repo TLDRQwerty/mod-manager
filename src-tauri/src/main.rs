@@ -26,7 +26,10 @@ fn main() {
             commands::disable_mod,
             commands::download_mod_details,
             commands::toggle_mod,
-            commands::update_mod_note
+            commands::update_mod_note,
+            commands::create_update_config,
+            commands::delete_config,
+            commands::find_config,
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

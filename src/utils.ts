@@ -22,9 +22,18 @@ const COMMANDS = {
   find_game: "find_game",
   update_mod_note: "update_mod_note",
   update_game_note: "update_game_note",
+  create_update_config: "create_update_config",
+  delete_config: "delete_config",
+  find_config: "find_config",
 } as const;
 
 type COMMANDS = (typeof COMMANDS)[keyof typeof COMMANDS];
+
+export const CONFIG_KEYS = {
+  NEXUS_API_KEY: "NEXUS_API_KEY",
+};
+
+export type CONFIG_KEYS = (typeof CONFIG_KEYS)[keyof typeof CONFIG_KEYS];
 
 export function useInvokeQuery<T>(
   command: COMMANDS,
