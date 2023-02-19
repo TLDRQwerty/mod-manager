@@ -10,7 +10,7 @@ export default function Image({ className, ...rest }: Props): JSX.Element {
   return (
     <>
       <Dialog
-        size="7xl"
+        size="6xl"
         open={open}
         padding={false}
         onClose={() => {

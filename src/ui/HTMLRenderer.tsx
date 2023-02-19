@@ -1,4 +1,5 @@
 import { Fragment, ReactElement, useRef } from "react";
+import Code from "./Code";
 import Image from "./Image";
 
 interface Props {
@@ -19,10 +20,16 @@ class HTMLParser {
     if (node.textContent == null) {
       return null;
     }
-    const text = node.textContent
-      .replace(/\[.*?\]/g, "")
-      .replace(/<br \/>/g, "");
-    return <>{text}</>;
+
+    return <>{this.parseText(node.textContent)}</>;
+  }
+
+  private parseText(text: string | null): string {
+    if (text == null) {
+      return "";
+    }
+    const replacedText = text.replace(/\[.*?\]/g, "").replace(/<br \/>/g, "\n");
+    return replacedText;
   }
 
   private parseElementNode(node: Node): ReactElement | null {
@@ -63,7 +70,16 @@ class HTMLParser {
         return <ul>{this.parseChildren(element)}</ul>;
       case "LI":
         return <li>{this.parseChildren(element)}</li>;
+      case "DIV":
+        return <div>{this.parseChildren(element)}</div>;
+      case "CODE":
+        return (
+          <Code language="json">{this.parseText(element.textContent)}</Code>
+        );
+      case "I":
+        return <i>{this.parseChildren(element)}</i>;
       default:
+        console.log("Unknown tag", tagName);
         return null;
     }
   }
