@@ -48,7 +48,7 @@ export default function Select<T>({
               key={getKey(option)}
               value={option}
               className={clsx(
-                "relative cursor-pointer select-none py-2 pl-10 pr-4 ui-active:bg-amber-100 ui-active:text-amber-900 text-gray-900",
+                "relative cursor-pointer select-none py-2 pl-10 pr-4 text-gray-900 ui-active:bg-amber-100 ui-active:text-amber-900",
                 itemClassName
               )}
             >

@@ -32,7 +32,7 @@ function ToggleButton({
 }): JSX.Element {
   return (
     <button
-      className={clsx("border border-black rounded-md px-2 py-1", {
+      className={clsx("rounded-md border border-black px-2 py-1", {
         "bg-gray-800 text-white": active,
       })}
       {...props}
@@ -128,7 +128,7 @@ export default function Editor({
       </div>
       <EditorContent
         editor={editor}
-        className="border border-gray-200 rounded-lg m-2 p-2"
+        className="m-2 rounded-lg border border-gray-200 p-2"
       />
     </>
   );

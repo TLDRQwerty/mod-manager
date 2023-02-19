@@ -39,12 +39,12 @@ export function DragDrop({
       }}
       onClick={onFilesPicked != null ? onClick : undefined}
       onDrop={onDrop}
-      className={`cursor-pointer border-dashed border-2 border-gray-300 rounded-lg ${className} `}
+      className={`cursor-pointer rounded-lg border-2 border-dashed border-gray-300 ${className} `}
     >
       <div
         className={`${
           onDragOver ? "bg-blue-900/75" : "bg-gray-100"
-        } h-32 flex justify-center items-center`}
+        } flex h-32 items-center justify-center`}
       >
         <div className="text-center">
           {onDragOver ? (

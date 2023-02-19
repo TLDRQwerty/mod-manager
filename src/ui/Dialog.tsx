@@ -51,7 +51,7 @@ function Dialog({
       <BaseDialog
         open={open}
         onClose={onClose}
-        className={`relative z-50 inset-0 shadow-2xl space-y-2 bg-red-400`}
+        className={`relative inset-0 z-50 space-y-2 bg-red-400 shadow-2xl`}
       >
         <Transition.Child
           enter="ease-out duration-300"
@@ -120,7 +120,7 @@ function Warning({
       <Dialog open={open} onClose={onClose}>
         <Title>Warning</Title>
         <Description>{description}</Description>
-        <div className="flex-row flex justify-between">
+        <div className="flex flex-row justify-between">
           <Button onClick={onClose} intent="secondary">
             Cancel
           </Button>

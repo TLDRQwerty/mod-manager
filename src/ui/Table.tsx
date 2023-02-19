@@ -8,7 +8,7 @@ interface Props extends React.HTMLAttributes<HTMLDivElement> {
 
 function Table({ className, children, ...rest }: Props): JSX.Element {
   return (
-    <div className={clsx("grid grid-template-cols")} {...rest}>
+    <div className={clsx("grid-template-cols grid")} {...rest}>
       {children}
     </div>
   );
@@ -30,7 +30,7 @@ function Row({ children, className, ...rest }: Props): JSX.Element {
   return (
     <div
       className={clsx(
-        "items-center grid gap-4 border-b border-black grid-cols-[repeat(auto-fit,minmax(20px,_1fr))] hover:bg-gray-300/25",
+        "grid grid-cols-[repeat(auto-fit,minmax(20px,_1fr))] items-center gap-4 border-b border-black hover:bg-gray-300/25",
         className
       )}
       {...rest}

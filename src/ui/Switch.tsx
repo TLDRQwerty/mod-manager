@@ -24,8 +24,8 @@ export default function Switch({
           className={clsx(
             "relative inline-flex h-6 w-11 items-center rounded-full",
             {
-              "border border-gray-200 cursor-default": disabled,
-              "ui-checked:bg-blue-600 ui-not-checked:bg-gray-200 cursor-pointer":
+              "cursor-default border border-gray-200": disabled,
+              "cursor-pointer ui-checked:bg-blue-600 ui-not-checked:bg-gray-200":
                 disabled === false || disabled == null,
             }
           )}

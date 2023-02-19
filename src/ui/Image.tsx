@@ -18,12 +18,12 @@ export default function Image({ className, ...rest }: Props): JSX.Element {
         }}
       >
         <TbMinimize
-          className="absolute top-0 right-0 cursor-pointer bg-white rounded text-black m-4 h-6 w-6 hover:bg-gray-300"
+          className="absolute top-0 right-0 m-4 h-6 w-6 cursor-pointer rounded bg-white text-black hover:bg-gray-300"
           onClick={() => {
             setOpen(false);
           }}
         />
-        <img {...rest} className={"w-full h-full aspect-auto"} />
+        <img {...rest} className={"aspect-auto h-full w-full"} />
       </Dialog>
       <img
         onClick={() => {

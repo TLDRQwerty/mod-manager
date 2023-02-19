@@ -63,7 +63,7 @@ function AddMods(): JSX.Element {
         }));
       }}
       onFilesPicked={handleFilesPicked}
-      className="bg-gray-100 my-8"
+      className="my-8 bg-gray-100"
     />
   );
 }
@@ -154,7 +154,7 @@ function Mods(): JSX.Element {
                 </Table.Cell>
                 <Table.Cell
                   className={clsx(
-                    "overflow-hidden whitespace-nowrap overflow-ellipsis",
+                    "overflow-hidden overflow-ellipsis whitespace-nowrap",
                     modId != null ? "hidden" : "visible"
                   )}
                 >
@@ -232,7 +232,7 @@ function FetchModDetails({ modId }: { modId: string }): JSX.Element {
             >
               <Input {...register("modId")} />
             </Field>
-            <div className="pt-4 flex flex-1 flex-row justify-between px-4">
+            <div className="flex flex-1 flex-row justify-between px-4 pt-4">
               <Button
                 intent="secondary"
                 onClick={() => {

@@ -6,7 +6,7 @@ export default function Checkbox({ ...props }: Props): JSX.Element {
   return (
     <input
       type="checkbox"
-      className="w-4 h-4 text-gray-600 border-gray-300 rounded focus:ring-indigo-500"
+      className="h-4 w-4 rounded border-gray-300 text-gray-600 focus:ring-indigo-500"
       {...props}
     />
   );

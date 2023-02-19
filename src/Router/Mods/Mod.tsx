@@ -27,7 +27,7 @@ function Mod(): JSX.Element {
     <>
       <h1>{data?.name}</h1>
       {data?.pictureUrl != null ? (
-        <Image className="w-[50%] aspect-auto" src={data?.pictureUrl} />
+        <Image className="aspect-auto w-[50%]" src={data?.pictureUrl} />
       ) : null}
       <Editor
         value={note}
