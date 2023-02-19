@@ -1,73 +1,100 @@
-import { createElement, Fragment, ReactElement, useRef } from "react";
+import { Fragment, ReactElement, useRef } from "react";
 import Image from "./Image";
 
 interface Props {
   value: string;
 }
 
-const BB_CODE_REGEX = /\[([^\]]+)\]/g;
-
 class HTMLParser {
-  private readonly domParser: DOMParser = new DOMParser();
-  private readonly dom: Document;
+  private readonly parser: DOMParser = new DOMParser();
+  private readonly doc: Document;
+  private readonly root: HTMLElement;
 
-  constructor(input: string) {
-    this.dom = this.domParser.parseFromString(input, "text/html");
+  constructor(html: string) {
+    this.doc = this.parser.parseFromString(html, "text/html");
+    this.root = this.doc.body;
   }
 
-  walk(node: Node | ChildNode | null, callback: (node: Node) => void): void {
-    if (node == null) {
-      return;
+  private parseTextNode(node: Node): ReactElement | null {
+    if (node.textContent == null) {
+      return null;
     }
-    callback(node);
-    node = node.firstChild;
-    while (node != null) {
-      this.walk(node, callback);
-      node = node.nextSibling;
-    }
+    const text = node.textContent
+      .replace(/\[.*?\]/g, "")
+      .replace(/<br \/>/g, "");
+    return <>{text}</>;
   }
 
-  imgTagToReactElement(node: HTMLImageElement): ReactElement {
-    const src = node.getAttribute("src");
-    if (src == null) {
-      return <Fragment />;
-    }
-    return <Image src={src} />;
-  }
+  private parseElementNode(node: Node): ReactElement | null {
+    const element = node as HTMLElement;
+    const { tagName } = element;
 
-  pTagToReactElement(node: HTMLParagraphElement): ReactElement {
-    if (BB_CODE_REGEX.test(node.textContent ?? "")) {
-      return <Fragment />;
-    } else {
-      return <p>{node.textContent}</p>;
-    }
-  }
-
-  parse(): ReactElement {
-    const root = this.dom.body;
-    const children: ReactElement[] = [];
-    this.walk(root, (node) => {
-      switch (node.nodeName) {
-        case "IMG":
-          children.push(this.imgTagToReactElement(node as HTMLImageElement));
-          break;
-        case "BR":
-          break;
-        case "P":
-          children.push(this.pTagToReactElement(node as HTMLParagraphElement));
-          break;
-        default:
-          if (node.textContent != null) {
-            const text = node.textContent;
-            const matches = text.match(BB_CODE_REGEX);
-            if (matches == null) {
-              children.push(<Fragment key={text}>{text}</Fragment>);
-            }
-          }
-          break;
+    switch (tagName) {
+      case "IMG": {
+        const src = element.getAttribute("src");
+        const alt = element.getAttribute("alt");
+        if (src == null) {
+          return null;
+        }
+        return <Image src={src} alt={alt ?? undefined} />;
       }
-    });
-    return <Fragment>{children}</Fragment>;
+      case "BR":
+        return null;
+      case "P":
+        return <p>{this.parseChildren(element)}</p>;
+      case "A": {
+        const href = element.getAttribute("href");
+        if (href == null) {
+          return null;
+        }
+        return (
+          <a target="_blank" rel="noreferrer" href={href}>
+            {this.parseChildren(element)}
+          </a>
+        );
+      }
+      case "B":
+        return <b>{this.parseChildren(element)}</b>;
+      case "SPAN":
+        return <span>{this.parseChildren(element)}</span>;
+      case "OL":
+        return <ol>{this.parseChildren(element)}</ol>;
+      case "UL":
+        return <ul>{this.parseChildren(element)}</ul>;
+      case "LI":
+        return <li>{this.parseChildren(element)}</li>;
+      default:
+        return null;
+    }
+  }
+
+  private parseNode(node: Node): ReactElement | null {
+    if (node.nodeType === Node.TEXT_NODE) {
+      return this.parseTextNode(node);
+    }
+
+    if (node.nodeType === Node.ELEMENT_NODE) {
+      return this.parseElementNode(node);
+    }
+    return null;
+  }
+
+  private parseChildren(node: Node): ReactElement[] {
+    const children: ReactElement[] = [];
+
+    for (const child of node.childNodes) {
+      const element = this.parseNode(child);
+
+      if (element != null) {
+        children.push(element);
+      }
+    }
+
+    return children;
+  }
+
+  public parse(): ReactElement | null {
+    return <Fragment>{this.parseChildren(this.root)}</Fragment>;
   }
 }
 
