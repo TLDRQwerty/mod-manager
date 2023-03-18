@@ -4,11 +4,11 @@ use bbclash::bbcode_to_html;
 use prisma::{game, game_mod};
 use prisma_client_rust::{NewClientError, QueryError};
 use std::fs::File;
-use tauri::{generate_context, State};
+use tauri::generate_context;
 use tempfile::Builder;
 use tokio::fs::symlink;
 
-use crate::prisma::{self, config, game_mod::relative_folder_path};
+use crate::prisma::{self, config};
 
 #[derive(thiserror::Error, Debug)]
 pub enum Error {
@@ -35,13 +35,15 @@ pub enum Error {
 }
 
 impl serde::Serialize for Error {
-    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    fn serialize<S>(&self, serializer: S) -> std::result::Result<S::Ok, S::Error>
     where
         S: serde::Serializer,
     {
         serializer.serialize_str(&self.to_string().as_ref())
     }
 }
+
+type Result<T> = std::result::Result<T, Error>;
 
 #[tauri::command]
 pub async fn create_update_game(
@@ -50,7 +52,7 @@ pub async fn create_update_game(
     game_mod_folder_path: String,
     nexus_game_identifier: Option<String>,
     note: Option<String>,
-) -> Result<game::Data, Error> {
+) -> Result<game::Data> {
     let client = prisma::new_client().await.unwrap();
 
     if let Some(id) = id {
@@ -80,7 +82,7 @@ pub async fn create_update_game(
 }
 
 #[tauri::command]
-pub async fn update_mod_note(id: i32, note: String) -> Result<game_mod::Data, Error> {
+pub async fn update_mod_note(id: i32, note: String) -> Result<game_mod::Data> {
     let client = prisma::new_client().await.unwrap();
 
     let game_mod = client
@@ -96,7 +98,7 @@ pub async fn update_mod_note(id: i32, note: String) -> Result<game_mod::Data, Er
 }
 
 #[tauri::command]
-pub async fn find_all_games() -> Result<Vec<game::Data>, Error> {
+pub async fn find_all_games() -> Result<Vec<game::Data>> {
     let client = prisma::new_client().await.unwrap();
 
     let game = client.game().find_many(vec![]).exec().await?;
@@ -105,7 +107,7 @@ pub async fn find_all_games() -> Result<Vec<game::Data>, Error> {
 }
 
 #[tauri::command]
-pub async fn delete_game(game_id: i32) -> Result<game::Data, Error> {
+pub async fn delete_game(game_id: i32) -> Result<game::Data> {
     let client = prisma::new_client().await.unwrap();
 
     let game = client
@@ -186,7 +188,7 @@ pub async fn delete_game(game_id: i32) -> Result<game::Data, Error> {
 }
 
 #[tauri::command]
-pub async fn find_all_mods_for_game(game_id: i32) -> Result<Vec<game_mod::Data>, Error> {
+pub async fn find_all_mods_for_game(game_id: i32) -> Result<Vec<game_mod::Data>> {
     let client = prisma::new_client().await.unwrap();
 
     let mods = client
@@ -199,7 +201,7 @@ pub async fn find_all_mods_for_game(game_id: i32) -> Result<Vec<game_mod::Data>,
 }
 
 #[tauri::command]
-pub async fn add_mods(paths: Vec<String>, game_id: i32) -> Result<Vec<game_mod::Data>, Error> {
+pub async fn add_mods(paths: Vec<String>, game_id: i32) -> Result<Vec<game_mod::Data>> {
     let client = prisma::new_client().await?;
 
     let mut mods: Vec<game_mod::Data> = vec![];
@@ -299,7 +301,7 @@ pub async fn add_mods(paths: Vec<String>, game_id: i32) -> Result<Vec<game_mod::
 }
 
 #[tauri::command]
-pub async fn delete_mod(mod_id: i32) -> Result<game_mod::Data, Error> {
+pub async fn delete_mod(mod_id: i32) -> Result<game_mod::Data> {
     let client = prisma::new_client().await.unwrap();
 
     let game_mod = client
@@ -326,7 +328,7 @@ pub async fn delete_mod(mod_id: i32) -> Result<game_mod::Data, Error> {
 }
 
 #[tauri::command]
-pub async fn enable_mod(mod_id: i32) -> Result<game_mod::Data, Error> {
+pub async fn enable_mod(mod_id: i32) -> Result<game_mod::Data> {
     let client = prisma::new_client().await.unwrap();
 
     let game_mod = client
@@ -376,7 +378,7 @@ pub async fn enable_mod(mod_id: i32) -> Result<game_mod::Data, Error> {
 }
 
 #[tauri::command]
-pub async fn disable_mod(mod_id: i32) -> Result<game_mod::Data, Error> {
+pub async fn disable_mod(mod_id: i32) -> Result<game_mod::Data> {
     let client = prisma::new_client().await.unwrap();
 
     let game_mod = client
@@ -423,7 +425,7 @@ pub async fn disable_mod(mod_id: i32) -> Result<game_mod::Data, Error> {
 }
 
 #[tauri::command]
-pub async fn find_game(game_id: i32) -> Result<game::Data, Error> {
+pub async fn find_game(game_id: i32) -> Result<game::Data> {
     let client = prisma::new_client().await.unwrap();
 
     let game = client
@@ -440,7 +442,7 @@ pub async fn find_game(game_id: i32) -> Result<game::Data, Error> {
 }
 
 #[tauri::command]
-pub async fn find_mod(mod_id: i32) -> Result<game_mod::Data, Error> {
+pub async fn find_mod(mod_id: i32) -> Result<game_mod::Data> {
     let client = prisma::new_client().await.unwrap();
 
     let game_mod = client
@@ -457,7 +459,7 @@ pub async fn find_mod(mod_id: i32) -> Result<game_mod::Data, Error> {
 }
 
 #[tauri::command]
-pub async fn toggle_mod(mod_id: i32) -> Result<game_mod::Data, Error> {
+pub async fn toggle_mod(mod_id: i32) -> Result<game_mod::Data> {
     let client = prisma::new_client().await.unwrap();
 
     let game_mod = client
@@ -478,7 +480,7 @@ pub async fn toggle_mod(mod_id: i32) -> Result<game_mod::Data, Error> {
 }
 
 #[tauri::command]
-pub async fn create_update_config(key: String, value: String) -> Result<config::Data, Error> {
+pub async fn create_update_config(key: String, value: String) -> Result<config::Data> {
     let client = prisma::new_client().await.unwrap();
 
     let config = client
@@ -501,7 +503,7 @@ pub async fn create_update_config(key: String, value: String) -> Result<config::
 }
 
 #[tauri::command]
-pub async fn delete_config(key: String) -> Result<config::Data, Error> {
+pub async fn delete_config(key: String) -> Result<config::Data> {
     let client = prisma::new_client().await.unwrap();
 
     Ok(client
@@ -512,7 +514,7 @@ pub async fn delete_config(key: String) -> Result<config::Data, Error> {
 }
 
 #[tauri::command]
-pub async fn find_config(key: String) -> Result<Option<config::Data>, Error> {
+pub async fn find_config(key: String) -> Result<Option<config::Data>> {
     let client = prisma::new_client().await.unwrap();
 
     let config = client
@@ -548,7 +550,7 @@ async fn download_mod_from_url(url: String) -> String {
 }
 
 #[tauri::command]
-pub async fn download_mod_details(mod_id: i32, nexus_mod_id: i32) -> Result<game_mod::Data, Error> {
+pub async fn download_mod_details(mod_id: i32, nexus_mod_id: i32) -> Result<game_mod::Data> {
     println!("download_mod_details");
     let client = prisma::new_client().await.unwrap();
 
@@ -649,7 +651,7 @@ struct ModDetailReponse {
 
 impl NexusIntegration {
     const NEXUS_API_ROUTE: &str = "https://api.nexusmods.com/v1";
-    async fn new() -> Result<Self, Error> {
+    async fn new() -> Result<Self> {
         let client = prisma::new_client().await?;
         let config = client
             .config()
@@ -658,7 +660,7 @@ impl NexusIntegration {
             .await?;
         match config {
             Some(config) => Ok(Self {
-                api_key: config.value
+                api_key: config.value,
             }),
             None => Err(Error::StringError("Nexus API Key not set".to_string())),
         }

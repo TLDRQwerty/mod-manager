@@ -7,16 +7,19 @@ import Field from "~/ui/Field";
 import * as z from "zod";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Input from "~/ui/Input";
 import Form from "~/ui/Form";
 import { CONFIG_KEYS, useInvokeMutation, useInvokeQuery } from "~/utils";
+import { useAddNotification } from "~/ui/Notifications";
 
 const settingsSchema = z.object({
   nexusApiKey: z.string(),
 });
 
 function Root(): JSX.Element {
+  const addNotification = useAddNotification();
+
   const { data } = useInvokeQuery<{ key: string; value: string }>(
     "find_config",
     {

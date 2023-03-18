@@ -50,7 +50,7 @@ export function useInvokeQuery<T>(
 
 export function useInvokeMutation<T, A = Record<string, unknown>>(
   command: COMMANDS,
-  options?: UseMutationOptions<T | string>
+  options?: UseMutationOptions<T | string, A>
 ): UseMutationResult<T, unknown, A> {
   return useMutation<T, unknown, A>(async (args: A) => {
     return await invoke<T>(command, args);
